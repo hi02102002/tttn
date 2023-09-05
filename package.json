@@ -1,0 +1,16 @@
+{
+   "name": "tttn",
+   "version": "1.0.0",
+   "description": "",
+   "main": "index.js",
+   "scripts": {
+      "backend": "npm run dev --prefix backend",
+      "frontend": "npm run dev --prefix frontend",
+      "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+   },
+   "author": "",
+   "license": "ISC",
+   "devDependencies": {
+      "concurrently": "^8.2.1"
+   }
+}
