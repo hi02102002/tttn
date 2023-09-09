@@ -1,0 +1,49 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table subjects {
+  id String [pk]
+  name String [unique, not null]
+  numCredits Int [not null]
+  scores scores [not null]
+}
+
+Table classes {
+  id String [pk]
+  name String [unique, not null]
+  academicYear Int [not null]
+  students students [not null]
+
+  indexes {
+    (name, academicYear) [unique]
+  }
+}
+
+Table students {
+  mssv String [pk]
+  name String [not null]
+  address String [not null]
+  classId String [not null]
+  class classes [not null]
+  scores scores [not null]
+}
+
+Table scores {
+  id String [pk]
+  score Decimal [not null]
+  studentId String [not null]
+  subjectId String [not null]
+  student students [not null]
+  subject subjects [not null]
+
+  indexes {
+    (studentId, subjectId) [unique]
+  }
+}
+
+Ref: students.classId > classes.id [delete: Cascade]
+
+Ref: scores.studentId > students.mssv
+
+Ref: scores.subjectId > subjects.id

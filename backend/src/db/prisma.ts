@@ -1,20 +1,17 @@
+import { PrismaClient } from '@prisma/client';
+
+let db: PrismaClient;
+
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: PrismaClient; // This must be a `var` and not a `let / const`
+  var __db: PrismaClient | undefined;
 }
 
-import { PrismaClient } from '@prisma/client';
-let prisma: PrismaClient;
-
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient({
-    log: ['query'],
-  });
-} else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
-  }
-  prisma = global.prisma;
+if (!global.__db) {
+  global.__db = new PrismaClient();
 }
 
-export default prisma;
+// eslint-disable-next-line prefer-const
+db = global.__db;
+
+export { db };

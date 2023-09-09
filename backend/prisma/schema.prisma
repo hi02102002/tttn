@@ -5,7 +5,54 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model Subject {
+  id         String  @id @default(uuid()) @map("subject_id")
+  name       String  @unique
+  numCredits Int     @map("num_credits")
+  scores     Score[] // 1 môn học có nhiều điểm
+
+  @@map("subjects")
+}
+
+model Class {
+  id           String    @id @default(uuid()) @map("class_id")
+  name         String    @unique
+  academicYear Int       @map("academic_year")
+  students     Student[] // 1 lớp có nhiều sinh viên 
+
+  @@unique([name, academicYear]) // 1 lớp chỉ có 1 niên khóa
+  @@map("classes")
+}
+
+model Student {
+  mssv    String  @id @map("mssv")
+  name    String
+  address String
+  classId String  @map("class_id")
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade) // 1 sinh viên chỉ thuộc 1 lớp
+  scores  Score[]
+
+  @@map("students")
+}
+
+model Score {
+  id    String  @id @default(uuid()) @map("score_id")
+  score Decimal
+
+  studentId String  @map("mssv")
+  subjectId String  @map("subject_id")
+  student   Student @relation(fields: [studentId], references: [mssv]) // 1 điểm thuộc 1 sinh viên
+  subject   Subject @relation(fields: [subjectId], references: [id]) // 1 điểm thuộc 1 môn học
+
+  @@unique([studentId, subjectId]) // 1 sinh viên chỉ có 1 điểm cho 1 môn học
+  @@map("scores")
 }
