@@ -39,6 +39,12 @@ class ClassroomsService {
    deleteClassrooms(ids: string[]): Promise<TBaseResponse<TClassroom[]>> {
       return httpClient.delete('/classes', { data: { ids } });
    }
+
+   exportAllClassrooms(): Promise<Blob> {
+      return httpClient.get('/classes/export', {
+         responseType: 'blob',
+      });
+   }
 }
 
 export const classroomsService = new ClassroomsService();

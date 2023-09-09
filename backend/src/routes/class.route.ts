@@ -14,6 +14,7 @@ export class ClassRoute implements Routes {
   }
 
   public initializeRoutes() {
+    this.router.get(`${this.path}/export`, this.controller.exportClasses);
     this.router.get(
       `${this.path}`,
       validate({

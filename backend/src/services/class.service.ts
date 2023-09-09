@@ -3,6 +3,7 @@ import { CreateDto, QueryDto } from '@/dtos/classes';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Prisma } from '@prisma/client';
+import ExcelJS from 'exceljs';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
@@ -142,5 +143,70 @@ export class ClassService {
     });
 
     return classes;
+  }
+
+  async exportAllClassesWithStudent() {
+    const classes = await db.class.findMany({
+      include: {
+        students: true,
+      },
+    });
+
+    const workbook = new ExcelJS.Workbook();
+
+    classes.map(async _class => {
+      const sheet = workbook.addWorksheet(_class.name);
+
+      sheet.columns = this.getColumns();
+
+      this.fitWidthColumns(sheet);
+
+      for (const student of _class.students) {
+        sheet.addRow({
+          mssv: student.mssv,
+          name: student.name,
+          address: student.address,
+        });
+      }
+    });
+
+    return workbook;
+  }
+
+  getColumns(): Partial<ExcelJS.Column>[] {
+    return [
+      {
+        header: 'MSSV',
+        key: 'mssv',
+        fill: {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: {
+            argb: 'FF00FF00',
+          },
+        },
+      },
+      {
+        header: 'Name',
+        key: 'name',
+      },
+      {
+        header: 'Address',
+        key: 'address',
+      },
+    ];
+  }
+
+  fitWidthColumns(sheet: ExcelJS.Worksheet) {
+    sheet.columns.forEach(column => {
+      let maxLength = 0;
+      column['eachCell']({ includeEmpty: true }, function (cell) {
+        const columnLength = cell.value ? cell.value.toString().length : 10;
+        if (columnLength > maxLength) {
+          maxLength = columnLength;
+        }
+      });
+      column.width = maxLength < 10 ? 10 : maxLength;
+    });
   }
 }

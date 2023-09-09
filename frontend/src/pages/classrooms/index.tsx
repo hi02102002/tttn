@@ -17,6 +17,7 @@ import {
    useClassrooms,
    useCreateClassroom,
    useDeleteClassrooms,
+   useExportAllClassrooms,
    useUpdateClassroom,
 } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
@@ -58,8 +59,16 @@ const Classrooms: NextPageWithLayout = () => {
       isLoading: isDeletingClassrooms,
    } = useDeleteClassrooms(q);
 
+   const {
+      mutateAsync: handleExportAllClassrooms,
+      isLoading: isExportingAllClassrooms,
+   } = useExportAllClassrooms();
+
    const isLoadingActions =
-      isCreatingClassroom || isUpdatingClassroom || isDeletingClassrooms;
+      isCreatingClassroom ||
+      isUpdatingClassroom ||
+      isDeletingClassrooms ||
+      isExportingAllClassrooms;
 
    const columns: ColumnDef<TClassroom>[] = useMemo(
       () => [
@@ -221,7 +230,11 @@ const Classrooms: NextPageWithLayout = () => {
                            <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                 onClick={() => {
+                                    handleExportAllClassrooms();
+                                 }}
+                              >
                                  Export list of classes
                               </DropdownMenuItem>
                               <AddUpdateClassroomDialog

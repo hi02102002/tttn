@@ -58,4 +58,13 @@ export class ClassController {
       message: `Delete ${classes.count} classrooms successfully`,
     });
   });
+
+  public exportClasses = catchAsync(async (req, res) => {
+    const workbook = await this.classService.exportAllClassesWithStudent();
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=classes.xlsx');
+
+    await workbook.xlsx.write(res);
+  });
 }
