@@ -9,7 +9,9 @@ export const useExportAllClassrooms = () => {
       mutationFn: async () => {
          const res = await classroomsService.exportAllClassrooms();
 
-         download(res, 'classrooms.xlsx');
+         await download(res, 'classrooms.xlsx');
+
+         return res;
       },
       onSuccess: () => {
          toast.success('Export all classrooms successfully');

@@ -1,6 +1,7 @@
 import { Button, Input } from '@/components/ui';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useState } from 'react';
+import { useDebounce } from '.';
 
 type TProps = {
    placeholder?: string;
@@ -8,6 +9,7 @@ type TProps = {
 
 export const useFilterName = (props?: TProps) => {
    const [name, setName] = useState('');
+   const debounced = useDebounce(name, 800);
    const { placeholder } = props || {};
 
    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +21,7 @@ export const useFilterName = (props?: TProps) => {
          <div className="flex space-x-2">
             <Input
                placeholder={placeholder || 'Search'}
-               className="h-8 w-[150px] lg:w-[250px]"
+               className="w-[150px] lg:w-[250px]"
                value={name}
                onChange={handleNameChange}
             />
@@ -38,7 +40,7 @@ export const useFilterName = (props?: TProps) => {
    };
 
    return {
-      name,
+      name: debounced,
       render,
    };
 };

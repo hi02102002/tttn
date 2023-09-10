@@ -1,4 +1,5 @@
 import { AddUpdateClassroomDialog } from '@/components/pages/classrooms';
+import { AddUpdateStudent } from '@/components/pages/students';
 import {
    Button,
    Checkbox,
@@ -13,9 +14,11 @@ import {
    DropdownMenuTrigger,
    LoadingFullpage,
 } from '@/components/ui';
+import { ROUTES } from '@/constants';
 import {
    useClassrooms,
    useCreateClassroom,
+   useCreateStudent,
    useDeleteClassrooms,
    useExportAllClassrooms,
    useUpdateClassroom,
@@ -27,6 +30,7 @@ import { NextPageWithLayout } from '@/types/shared';
 import { calcPageCount } from '@/utils';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 
 const Classrooms: NextPageWithLayout = () => {
@@ -38,6 +42,7 @@ const Classrooms: NextPageWithLayout = () => {
    const { name: filterName, render: renderFilterName } = useFilterName({
       placeholder: 'Search by name',
    });
+   const router = useRouter();
 
    const q: TClassroomQuery = {
       page: pagination.pageIndex + 1,
@@ -64,11 +69,15 @@ const Classrooms: NextPageWithLayout = () => {
       isLoading: isExportingAllClassrooms,
    } = useExportAllClassrooms();
 
+   const { mutateAsync: handleCreateStudent, isLoading: isCreatingStudent } =
+      useCreateStudent(q);
+
    const isLoadingActions =
       isCreatingClassroom ||
       isUpdatingClassroom ||
       isDeletingClassrooms ||
-      isExportingAllClassrooms;
+      isExportingAllClassrooms ||
+      isCreatingStudent;
 
    const columns: ColumnDef<TClassroom>[] = useMemo(
       () => [
@@ -148,7 +157,29 @@ const Classrooms: NextPageWithLayout = () => {
                         </Button>
                      </DropdownMenuTrigger>
                      <DropdownMenuContent align="start" className="w-[160px]">
-                        <DropdownMenuItem>View students</DropdownMenuItem>
+                        <AddUpdateStudent
+                           classId={row.original.id}
+                           description={`Create student for classroom ${row.original.name}`}
+                           onSubmit={async ({ values, onClose }) => {
+                              await handleCreateStudent(values);
+                              onClose?.();
+                           }}
+                        >
+                           <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                           >
+                              Add new student
+                           </DropdownMenuItem>
+                        </AddUpdateStudent>
+                        <DropdownMenuItem
+                           onClick={() => {
+                              router.push(
+                                 `${ROUTES.STUDENTS}?classId=${row.original.id}`
+                              );
+                           }}
+                        >
+                           View students
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                            Export list of students
                         </DropdownMenuItem>
@@ -186,7 +217,7 @@ const Classrooms: NextPageWithLayout = () => {
             },
          },
       ],
-      [handleUpdateClassroom, isUpdatingClassroom]
+      [handleUpdateClassroom, isUpdatingClassroom, router]
    );
 
    return (

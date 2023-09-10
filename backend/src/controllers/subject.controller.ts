@@ -7,9 +7,9 @@ export class SubjectController {
   private readonly subjectService = Container.get(SubjectService);
 
   public getAllSubjects = catchAsync(async (req, res) => {
-    const subjects = await this.subjectService.getAllSubjects(req.query as any);
+    const data = await this.subjectService.getAllSubjects(req.query as any);
     res.status(StatusCodes.OK).json({
-      data: subjects,
+      data,
       message: 'Get all subjects successfully',
     });
   });
@@ -26,7 +26,7 @@ export class SubjectController {
     const subject = await this.subjectService.createSubject(req.body);
     res.status(StatusCodes.CREATED).json({
       data: subject,
-      message: `Create subject with name ${subject.name} successfully`,
+      message: `Create subject successfully`,
     });
   });
 
@@ -34,7 +34,7 @@ export class SubjectController {
     const subject = await this.subjectService.updateSubject(req.params.id, req.body);
     res.status(StatusCodes.OK).json({
       data: subject,
-      message: `Update subject ${subject.name} successfully`,
+      message: `Update subject successfully`,
     });
   });
 
@@ -42,7 +42,7 @@ export class SubjectController {
     const subject = await this.subjectService.deleteSubject(req.params.id);
     res.status(StatusCodes.OK).json({
       data: subject,
-      message: `Delete subject ${subject.name} successfully`,
+      message: `Delete subject successfully`,
     });
   });
 }

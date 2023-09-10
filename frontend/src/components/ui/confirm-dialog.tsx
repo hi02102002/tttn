@@ -9,6 +9,7 @@ import {
    DialogTitle,
    DialogTrigger,
 } from '@/components/ui';
+import { ReactNode } from 'react';
 
 type Props = {
    title?: string;
@@ -18,7 +19,7 @@ type Props = {
    textConfirm?: string;
    textCancel?: string;
    type?: 'destructive' | 'default';
-   message?: string;
+   message?: string | ReactNode;
 };
 
 export const ConfirmDialog = ({

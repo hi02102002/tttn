@@ -1,5 +1,5 @@
 import { StudentController } from '@/controllers';
-import { CreateDto, QueryDto, UpdateDto } from '@/dtos/students';
+import { CreateDto, DeleteStudentsDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { Routes } from '@/interfaces/routes.interface';
 import { validate } from '@/middlewares';
 import { Router } from 'express';
@@ -38,5 +38,12 @@ export class StudentRoute implements Routes {
       this.controller.updateStudent,
     );
     this.router.delete(`${this.path}/:mssv`, this.controller.deleteStudent);
+    this.router.delete(
+      `${this.path}`,
+      validate({
+        type: DeleteStudentsDto,
+      }),
+      this.controller.deleteManyStudents,
+    );
   }
 }

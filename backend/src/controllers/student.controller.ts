@@ -7,17 +7,17 @@ export class StudentController {
   private readonly studentService = Container.get(StudentService);
 
   public getAllStudents = catchAsync(async (req, res) => {
-    const students = await this.studentService.getAllStudents();
+    const data = await this.studentService.getAllStudents(req.query as any);
     res.status(StatusCodes.OK).json({
       message: 'Get all students successfully',
-      data: students,
+      data,
     });
   });
 
   public getStudentByMssv = catchAsync(async (req, res) => {
     const student = await this.studentService.getStudentByMssv(req.params.mssv);
     res.status(StatusCodes.OK).json({
-      message: 'Get student by id successfully',
+      message: 'Get student by MSSV successfully',
       data: student,
     });
   });
@@ -25,7 +25,7 @@ export class StudentController {
   public createStudent = catchAsync(async (req, res) => {
     const student = await this.studentService.createStudent(req.body);
     res.status(StatusCodes.CREATED).json({
-      message: `Create student with mssv ${student.mssv} successfully`,
+      message: `Create student with MSSV ${student.mssv} successfully`,
       data: student,
     });
   });
@@ -33,7 +33,7 @@ export class StudentController {
   public updateStudent = catchAsync(async (req, res) => {
     const student = await this.studentService.updateStudent(req.params.mssv, req.body);
     res.status(StatusCodes.OK).json({
-      message: `Update student with mssv ${student.mssv} successfully`,
+      message: `Update student with MSSV ${student.mssv} successfully`,
       data: student,
     });
   });
@@ -41,7 +41,14 @@ export class StudentController {
   public deleteStudent = catchAsync(async (req, res) => {
     await this.studentService.deleteStudent(req.params.mssv);
     res.status(StatusCodes.OK).json({
-      message: `Delete student with mssv ${req.params.mssv} successfully`,
+      message: `Delete student with MSSV ${req.params.mssv} successfully`,
+    });
+  });
+
+  public deleteManyStudents = catchAsync(async (req, res) => {
+    await this.studentService.deleteManyStudents(req.body.mssv);
+    res.status(StatusCodes.OK).json({
+      message: `Delete ${req.body.mssv.length} students successfully`,
     });
   });
 }

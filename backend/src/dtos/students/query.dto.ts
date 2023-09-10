@@ -1,5 +1,6 @@
+import { Prisma } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString } from 'class-validator';
 import { QueryPaginationDto } from '../shared';
 
 export class QueryDto extends QueryPaginationDto {
@@ -11,4 +12,18 @@ export class QueryDto extends QueryPaginationDto {
   @IsString()
   @IsOptional()
   classId: string;
+
+  @IsString()
+  @IsOptional()
+  @Transform(({ value }) => value?.trim())
+  address: string;
+
+  @IsObject()
+  @IsOptional()
+  orderBy: {
+    name: Prisma.SortOrder;
+    address: Prisma.SortOrder;
+    mssv: Prisma.SortOrder;
+    class: Prisma.ClassOrderByWithRelationInput;
+  };
 }

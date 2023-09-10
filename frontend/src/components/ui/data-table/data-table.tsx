@@ -79,8 +79,12 @@ export function DataTable<TData, TValue>({
       getFacetedUniqueValues: getFacetedUniqueValues(),
 
       getRowId: (row, relativeIndex, parent) => {
-         // @ts-ignore
-         return parent ? [parent.id, row?.id || row?.mssv].join('.') : row.id;
+         console.log(row, relativeIndex, parent);
+         return parent
+            ? // @ts-ignore
+              [parent.id, row?.id || row?.mssv].join('.')
+            : // @ts-ignore
+              row.id || row?.mssv;
       },
    });
 

@@ -1,4 +1,4 @@
-import { ESort, TQueryPagination } from './shared';
+import { TOderBy, TQueryPagination } from './shared';
 
 export type TClassroom = {
    name: string;
@@ -18,7 +18,4 @@ export type TClassroomDto = {
 export type TClassroomQuery = TQueryPagination & {
    name?: TClassroom['name'];
    academicYear?: TClassroom['academicYear'];
-   orderBy?: {
-      [key: string]: ESort;
-   };
-};
+} & TOderBy;

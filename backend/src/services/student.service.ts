@@ -1,7 +1,8 @@
 import { db } from '@/db/prisma';
 import { CreateDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { HttpException } from '@/exceptions';
-import { Class } from '@prisma/client';
+import { pagination } from '@/utils/pagination';
+import { Class, Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import 'reflect-metadata';
 import { Inject, Service } from 'typedi';
@@ -12,16 +13,42 @@ export class StudentService {
   private readonly classService: ClassService;
 
   async getAllStudents(q?: QueryDto) {
-    const { page, limit, name } = q || {};
+    const { page, limit, name, address, classId, orderBy } = q || {};
 
-    const students = await db.student.findMany({
-      orderBy: {},
-      include: {
-        class: true,
+    if (orderBy?.class) {
+      orderBy.class = {
+        name: orderBy.class as unknown as Prisma.SortOrder,
+      };
+    }
+
+    const where: Prisma.StudentWhereInput = {
+      name: {
+        contains: name,
       },
-    });
+      address: {
+        contains: address,
+      },
+      classId,
+    };
 
-    return students;
+    const [students, total] = await db.$transaction([
+      db.student.findMany({
+        where,
+        include: {
+          class: true,
+        },
+        ...pagination(page, limit),
+        orderBy,
+      }),
+      db.student.count({
+        where,
+      }),
+    ]);
+
+    return {
+      total,
+      students,
+    };
   }
 
   async getStudentByMssv(mssv: string) {
@@ -32,7 +59,7 @@ export class StudentService {
     });
 
     if (!student) {
-      throw new HttpException(StatusCodes.NOT_FOUND, `Student with this id not found`);
+      throw new HttpException(StatusCodes.NOT_FOUND, `Student with this MSSV not found`);
     }
 
     return student;
@@ -138,5 +165,17 @@ export class StudentService {
     });
 
     return students;
+  }
+
+  async deleteManyStudents(mssvs: string[]) {
+    const deletedStudents = await db.student.deleteMany({
+      where: {
+        mssv: {
+          in: mssvs,
+        },
+      },
+    });
+
+    return deletedStudents;
   }
 }

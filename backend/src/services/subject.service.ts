@@ -2,6 +2,7 @@ import { db } from '@/db/prisma';
 import { CreateDto, QueryDto, UpdateDto } from '@/dtos/subjects';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
+import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
@@ -9,37 +10,52 @@ import { Service } from 'typedi';
 export class SubjectService {
   async getAllSubjects(q?: QueryDto) {
     const { page, limit, name, studentId } = q || {};
-    const subjects = await db.subject.findMany({
-      where: {
-        name: {
-          contains: name,
-        },
-        scores: {
-          some: {
-            studentId,
-          },
-        },
-      },
-      ...pagination(page, limit),
-      select: {
-        id: true,
-        name: true,
-        scores: {
-          where: {
-            studentId,
-          },
-          select: {
-            id: true,
-            studentId: true,
-            subjectId: true,
-            score: true,
-          },
-        },
-        numCredits: true,
-      },
-    });
 
-    return subjects;
+    const { scores, ...orderBy } = q.orderBy || {};
+
+    const where: Prisma.SubjectWhereInput = {
+      name: {
+        contains: name,
+      },
+      scores: studentId ? { some: { studentId } } : undefined,
+    };
+
+    const [subjects, total] = await db.$transaction([
+      db.subject.findMany({
+        where,
+        ...pagination(page, limit),
+        select: {
+          id: true,
+          name: true,
+          scores: studentId
+            ? {
+                where: {
+                  studentId,
+                },
+                select: {
+                  id: true,
+                  studentId: true,
+                  subjectId: true,
+                  score: true,
+                },
+                orderBy: {
+                  score: scores,
+                },
+              }
+            : false,
+          numCredits: true,
+        },
+        orderBy,
+      }),
+      db.subject.count({
+        where,
+      }),
+    ]);
+
+    return {
+      subjects,
+      total,
+    };
   }
 
   async getSubjectById(id: string) {
@@ -100,5 +116,47 @@ export class SubjectService {
     });
 
     return deletedSubject;
+  }
+
+  async deleteSubjects(ids: string[]) {
+    const deletedSubjects = await db.subject.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return deletedSubjects;
+  }
+
+  async getSubjectsByMssv(mssv: string) {
+    const subjects = await db.subject.findMany({
+      where: {
+        scores: {
+          some: {
+            studentId: mssv,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        scores: {
+          where: {
+            studentId: mssv,
+          },
+          select: {
+            id: true,
+            studentId: true,
+            subjectId: true,
+            score: true,
+          },
+        },
+        numCredits: true,
+      },
+    });
+
+    return subjects;
   }
 }

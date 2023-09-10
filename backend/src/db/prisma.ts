@@ -8,7 +8,9 @@ declare global {
 }
 
 if (!global.__db) {
-  global.__db = new PrismaClient();
+  global.__db = new PrismaClient({
+    log: ['query', 'info', 'warn'],
+  });
 }
 
 // eslint-disable-next-line prefer-const

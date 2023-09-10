@@ -27,3 +27,9 @@ export type TBaseResponse<T = unknown> = {
 };
 
 export type ESort = 'asc' | 'desc';
+
+export type TOderBy = {
+   orderBy?: {
+      [key: string]: ESort;
+   };
+};
