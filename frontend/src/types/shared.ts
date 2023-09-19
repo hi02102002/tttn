@@ -33,3 +33,7 @@ export type TOderBy = {
       [key: string]: ESort;
    };
 };
+
+export interface TBaseService {
+   endpoint: string;
+}

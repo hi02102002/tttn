@@ -14,12 +14,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String     @id @default(uuid()) @map("user_id")
+  username String     @unique
+  password String
+  student  Student?
+  UserRole UserRole[] // 1 user có nhiều role
+}
+
+enum RoleName {
+  ADMIN
+  STUDENT
+}
+
+model Role {
+  id       String     @id @default(uuid()) @map("role_id")
+  name     RoleName   @unique
+  UserRole UserRole[] // 1 role có nhiều user
+}
+
+model UserRole {
+  userId String @map("user_id")
+  roleId String @map("role_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // 1 user có nhiều role
+  role   Role   @relation(fields: [roleId], references: [id]) // 1 role có nhiều user
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
 model Subject {
   id         String  @id @default(uuid()) @map("subject_id")
   name       String  @unique
   numCredits Int     @map("num_credits")
   scores     Score[] // 1 môn học có nhiều điểm
 
+  deletedAt DateTime? @map("deleted_at")
+
+  @@unique([name, deletedAt])
   @@map("subjects")
 }
 
@@ -40,17 +72,19 @@ model Student {
   classId String  @map("class_id")
   class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade) // 1 sinh viên chỉ thuộc 1 lớp
   scores  Score[]
+  user    User    @relation(fields: [userId], references: [id])
+  userId  String  @unique // relation scalar field (used in the `@relation` attribute above)
 
   @@map("students")
 }
 
 model Score {
-  id    String  @id @default(uuid()) @map("score_id")
-  score Decimal
+  id    String   @id @default(uuid()) @map("score_id")
+  score Decimal?
 
   studentId String  @map("mssv")
   subjectId String  @map("subject_id")
-  student   Student @relation(fields: [studentId], references: [mssv]) // 1 điểm thuộc 1 sinh viên
+  student   Student @relation(fields: [studentId], references: [mssv], onDelete: Cascade) // 1 điểm thuộc 1 sinh viên
   subject   Subject @relation(fields: [subjectId], references: [id]) // 1 điểm thuộc 1 môn học
 
   @@unique([studentId, subjectId]) // 1 sinh viên chỉ có 1 điểm cho 1 môn học

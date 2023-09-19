@@ -114,6 +114,7 @@ export const AddUpdateStudent = ({
                   className="space-y-3"
                   id="add-update-classroom-form"
                   onSubmit={handleSubmit(_handleSubmit)}
+                  autoComplete="off"
                >
                   <FormField
                      control={control}

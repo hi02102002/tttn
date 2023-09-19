@@ -1,5 +1,5 @@
 import { db } from '@/db/prisma';
-import { CreateDto, QueryDto, UpdateDto } from '@/dtos/students';
+import { AddSubjectsDto, CreateDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Class, Prisma } from '@prisma/client';
@@ -66,7 +66,6 @@ export class StudentService {
   }
 
   async createStudent(data: CreateDto) {
-    console.log(this.classService);
     const _class = await this.classService.getClassById(data.classId);
 
     let mssv = await this.generateMssv(_class);
@@ -177,5 +176,30 @@ export class StudentService {
     });
 
     return deletedStudents;
+  }
+
+  async addSubjectToStudent({ mssv, subjectIds }: AddSubjectsDto) {
+    await this.getStudentByMssv(mssv);
+
+    const subjects = await db.subject.findMany({
+      where: {
+        id: {
+          in: subjectIds,
+        },
+      },
+    });
+
+    if (subjects.length !== subjectIds.length) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, `Some subjects not found`);
+    }
+
+    await db.score.createMany({
+      data: subjects.map(subject => ({
+        studentId: mssv,
+        subjectId: subject.id,
+        score: null,
+      })),
+      skipDuplicates: true,
+    });
   }
 }

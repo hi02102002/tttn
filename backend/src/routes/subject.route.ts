@@ -24,7 +24,7 @@ export class SubjectRoute implements Routes {
     );
     this.router.get(`${this.path}/:id`, this.controller.getSubjectById);
     this.router.post(`${this.path}`, validate({ typeInput: 'body', type: CreateDto }), this.controller.createSubject);
-    this.router.put(`${this.path}/:id`, validate({ typeInput: 'body', type: UpdateDto }), this.controller.updateSubject);
+    this.router.patch(`${this.path}/:id`, validate({ typeInput: 'body', type: UpdateDto }), this.controller.updateSubject);
     this.router.delete(`${this.path}/:id`, this.controller.deleteSubject);
   }
 }

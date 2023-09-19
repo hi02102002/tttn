@@ -8,4 +8,13 @@ export const ROUTES = {
    STUDENTS: '/students',
    SUBJECTS: '/subjects',
    SCORES: '/scores',
+   ROLES: '/roles',
+};
+
+export const ENDPOINTS = {
+   STUDENTS: '/students',
+   ROLES: '/roles',
+   CLASSES: '/classes',
+   SUBJECTS: '/subjects',
+   SCORES: '/scores',
 };

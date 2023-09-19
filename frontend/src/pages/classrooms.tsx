@@ -1,4 +1,7 @@
-import { AddUpdateClassroomDialog } from '@/components/pages/classrooms';
+import {
+   AddUpdateClassroomDialog,
+   ExportClassrooms,
+} from '@/components/pages/classrooms';
 import { AddUpdateStudent } from '@/components/pages/students';
 import {
    Button,
@@ -20,7 +23,7 @@ import {
    useCreateClassroom,
    useCreateStudent,
    useDeleteClassrooms,
-   useExportAllClassrooms,
+   useExportClassrooms,
    useUpdateClassroom,
 } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
@@ -67,7 +70,7 @@ const Classrooms: NextPageWithLayout = () => {
    const {
       mutateAsync: handleExportAllClassrooms,
       isLoading: isExportingAllClassrooms,
-   } = useExportAllClassrooms();
+   } = useExportClassrooms();
 
    const { mutateAsync: handleCreateStudent, isLoading: isCreatingStudent } =
       useCreateStudent(q);
@@ -180,9 +183,22 @@ const Classrooms: NextPageWithLayout = () => {
                         >
                            View students
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                           Export list of students
-                        </DropdownMenuItem>
+                        <ExportClassrooms
+                           classroom={row.original}
+                           onSubmit={async ({ name, onClose }) => {
+                              await handleExportAllClassrooms({
+                                 classId: row.original.id,
+                                 filename: name,
+                              });
+                              onClose?.();
+                           }}
+                        >
+                           <DropdownMenuItem
+                              onSelect={(e) => e.preventDefault()}
+                           >
+                              Export list of students
+                           </DropdownMenuItem>
+                        </ExportClassrooms>
                         <AddUpdateClassroomDialog
                            title="Update classroom"
                            description="Update classroom details"
@@ -217,7 +233,13 @@ const Classrooms: NextPageWithLayout = () => {
             },
          },
       ],
-      [handleUpdateClassroom, isUpdatingClassroom, router]
+      [
+         handleUpdateClassroom,
+         isUpdatingClassroom,
+         router,
+         handleCreateStudent,
+         handleExportAllClassrooms,
+      ]
    );
 
    return (
@@ -263,7 +285,7 @@ const Classrooms: NextPageWithLayout = () => {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                  onClick={() => {
-                                    handleExportAllClassrooms();
+                                    handleExportAllClassrooms(undefined);
                                  }}
                               >
                                  Export list of classes

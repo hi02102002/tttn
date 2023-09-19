@@ -25,18 +25,23 @@ const Layout = ({ classNameMain, children }: Props) => {
                },
                {
                   id: uuid(),
-                  name: 'Students',
-                  path: ROUTES.STUDENTS,
-               },
-               {
-                  id: uuid(),
                   name: 'Subjects',
                   path: ROUTES.SUBJECTS,
                },
                {
                   id: uuid(),
+                  name: 'Students',
+                  path: ROUTES.STUDENTS,
+               },
+               {
+                  id: uuid(),
                   name: 'Scores',
                   path: ROUTES.SCORES,
+               },
+               {
+                  id: uuid(),
+                  name: 'Roles',
+                  path: ROUTES.ROLES,
                },
             ]}
          />

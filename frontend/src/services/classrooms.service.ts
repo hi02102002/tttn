@@ -1,25 +1,27 @@
+import { ENDPOINTS } from '@/constants';
 import { httpClient } from '@/lib/axios';
 import { TClassroom, TClassroomDto, TClassroomQuery } from '@/types/class';
-import { TBaseResponse } from '@/types/shared';
+import { TBaseResponse, TBaseService } from '@/types/shared';
 
-class ClassroomsService {
+class ClassroomsService implements TBaseService {
+   endpoint: string = ENDPOINTS.CLASSES;
    getAllClassrooms(q?: TClassroomQuery): Promise<
       TBaseResponse<{
          total: number;
          classes: TClassroom[];
       }>
    > {
-      return httpClient.get('/classes', { params: q });
+      return httpClient.get(this.endpoint, { params: q });
    }
 
    getClassroomById(id: string): Promise<TBaseResponse<TClassroom>> {
-      return httpClient.get(`/classes/${id}`);
+      return httpClient.get(`${this.endpoint}/${id}`);
    }
 
    createClassroom(data: TClassroomDto): Promise<TBaseResponse<TClassroom>> {
       const academicYear = data.academicYear.getFullYear();
 
-      return httpClient.post('/classes', {
+      return httpClient.post(this.endpoint, {
          ...data,
          academicYear,
       });
@@ -29,19 +31,19 @@ class ClassroomsService {
       id: string,
       data: Partial<TClassroomDto>
    ): Promise<TBaseResponse<TClassroom>> {
-      return httpClient.patch(`/classes/${id}`, data);
+      return httpClient.patch(`${this.endpoint}/${id}`, data);
    }
 
    deleteClassroom(id: string): Promise<TBaseResponse<TClassroom>> {
-      return httpClient.delete(`/classes/${id}`);
+      return httpClient.delete(`${this.endpoint}/${id}`);
    }
 
    deleteClassrooms(ids: string[]): Promise<TBaseResponse<TClassroom[]>> {
-      return httpClient.delete('/classes', { data: { ids } });
+      return httpClient.delete(this.endpoint, { data: { ids } });
    }
 
-   exportAllClassrooms(): Promise<Blob> {
-      return httpClient.get('/classes/export', {
+   exportAllClassrooms(data?: { classId?: string }): Promise<Blob> {
+      return httpClient.post(`${this.endpoint}/export`, data, {
          responseType: 'blob',
       });
    }

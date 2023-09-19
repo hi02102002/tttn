@@ -60,7 +60,7 @@ export class ClassController {
   });
 
   public exportClasses = catchAsync(async (req, res) => {
-    const workbook = await this.classService.exportAllClassesWithStudent();
+    const workbook = await this.classService.exportAllClassesWithStudent(req.body as any);
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=classes.xlsx');

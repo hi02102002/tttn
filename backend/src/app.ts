@@ -1,5 +1,5 @@
 import { CREDENTIALS, LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from '@/configs';
-import { ErrorMiddleware } from '@/middlewares';
+import { ErrorMiddleware, dbLogger, subjectSoftDelete } from '@/middlewares';
 import { Routes } from '@interfaces/routes.interface';
 import { logger, stream } from '@utils/logger';
 import compression from 'compression';
@@ -47,6 +47,8 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
+    dbLogger();
+    subjectSoftDelete();
   }
 
   private initializeRoutes(routes: Routes[]) {

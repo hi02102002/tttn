@@ -13,7 +13,7 @@ export const useFilterName = (props?: TProps) => {
    const { placeholder } = props || {};
 
    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setName(e.target.value.trim());
+      setName(e.target.value);
    };
 
    const render = () => {

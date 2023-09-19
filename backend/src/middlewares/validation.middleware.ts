@@ -22,8 +22,8 @@ type TOptions = {
 
 export const validate = ({ type, typeInput = 'body', skipMissingProperties = false, whitelist = true, forbidNonWhitelisted = true }: TOptions) => {
   return (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
     const dto = plainToInstance(type, req[typeInput]);
-    console.log({ dto });
     validateOrReject(dto, { skipMissingProperties, whitelist, forbidNonWhitelisted })
       .then(() => {
         req[typeInput] = dto;

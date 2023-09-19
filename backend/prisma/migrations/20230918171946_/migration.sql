@@ -1,0 +1,90 @@
+-- CreateTable
+CREATE TABLE `User` (
+    `user_id` VARCHAR(191) NOT NULL,
+    `username` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `User_username_key`(`username`),
+    PRIMARY KEY (`user_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Role` (
+    `role_id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `Role_name_key`(`name`),
+    PRIMARY KEY (`role_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `user_roles` (
+    `user_id` VARCHAR(191) NOT NULL,
+    `role_id` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`user_id`, `role_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `subjects` (
+    `subject_id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `num_credits` INTEGER NOT NULL,
+    `deleted_at` DATETIME(3) NULL,
+
+    UNIQUE INDEX `subjects_name_key`(`name`),
+    UNIQUE INDEX `subjects_name_deleted_at_key`(`name`, `deleted_at`),
+    PRIMARY KEY (`subject_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `classes` (
+    `class_id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `academic_year` INTEGER NOT NULL,
+
+    UNIQUE INDEX `classes_name_key`(`name`),
+    UNIQUE INDEX `classes_name_academic_year_key`(`name`, `academic_year`),
+    PRIMARY KEY (`class_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `students` (
+    `mssv` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(191) NOT NULL,
+    `address` VARCHAR(191) NOT NULL,
+    `class_id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `students_userId_key`(`userId`),
+    PRIMARY KEY (`mssv`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `scores` (
+    `score_id` VARCHAR(191) NOT NULL,
+    `score` DECIMAL(65, 30) NULL,
+    `mssv` VARCHAR(191) NOT NULL,
+    `subject_id` VARCHAR(191) NOT NULL,
+
+    UNIQUE INDEX `scores_mssv_subject_id_key`(`mssv`, `subject_id`),
+    PRIMARY KEY (`score_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `user_roles` ADD CONSTRAINT `user_roles_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `user_roles` ADD CONSTRAINT `user_roles_role_id_fkey` FOREIGN KEY (`role_id`) REFERENCES `Role`(`role_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `students` ADD CONSTRAINT `students_class_id_fkey` FOREIGN KEY (`class_id`) REFERENCES `classes`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `students` ADD CONSTRAINT `students_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `scores` ADD CONSTRAINT `scores_mssv_fkey` FOREIGN KEY (`mssv`) REFERENCES `students`(`mssv`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `scores` ADD CONSTRAINT `scores_subject_id_fkey` FOREIGN KEY (`subject_id`) REFERENCES `subjects`(`subject_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

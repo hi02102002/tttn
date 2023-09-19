@@ -18,3 +18,8 @@ export type TQueryStudent = Partial<{
    TOderBy;
 
 export type TStudentDto = Omit<TStudent, 'mssv' | 'class'>;
+
+export type TAddSubjectsToStudentDto = {
+   mssv: string;
+   subjectIds: string[];
+};

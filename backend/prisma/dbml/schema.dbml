@@ -2,11 +2,41 @@
 //// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 //// ------------------------------------------------------
 
+Table User {
+  id String [pk]
+  username String [unique, not null]
+  password String [not null]
+  student students
+  UserRole user_roles [not null]
+}
+
+Table Role {
+  id String [pk]
+  name RoleName [unique, not null]
+  UserRole user_roles [not null]
+}
+
+Table user_roles {
+  userId String [not null]
+  roleId String [not null]
+  user User [not null]
+  role Role [not null]
+
+  indexes {
+    (userId, roleId) [pk]
+  }
+}
+
 Table subjects {
   id String [pk]
   name String [unique, not null]
   numCredits Int [not null]
   scores scores [not null]
+  deletedAt DateTime
+
+  indexes {
+    (name, deletedAt) [unique]
+  }
 }
 
 Table classes {
@@ -27,11 +57,13 @@ Table students {
   classId String [not null]
   class classes [not null]
   scores scores [not null]
+  user User [not null]
+  userId String [unique, not null]
 }
 
 Table scores {
   id String [pk]
-  score Decimal [not null]
+  score Decimal
   studentId String [not null]
   subjectId String [not null]
   student students [not null]
@@ -42,8 +74,19 @@ Table scores {
   }
 }
 
+Enum RoleName {
+  ADMIN
+  STUDENT
+}
+
+Ref: user_roles.userId > User.id [delete: Cascade]
+
+Ref: user_roles.roleId > Role.id
+
 Ref: students.classId > classes.id [delete: Cascade]
 
-Ref: scores.studentId > students.mssv
+Ref: students.userId - User.id
+
+Ref: scores.studentId > students.mssv [delete: Cascade]
 
 Ref: scores.subjectId > subjects.id

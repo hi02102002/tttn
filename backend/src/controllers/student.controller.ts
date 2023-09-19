@@ -51,4 +51,11 @@ export class StudentController {
       message: `Delete ${req.body.mssv.length} students successfully`,
     });
   });
+
+  public addSubjects = catchAsync(async (req, res) => {
+    await this.studentService.addSubjectToStudent(req.body);
+    res.status(StatusCodes.OK).json({
+      message: `Add subjects to student with MSSV ${req.body.mssv} successfully`,
+    });
+  });
 }

@@ -8,12 +8,16 @@ import {
    LoadingFullpage,
 } from '@/components/ui';
 import { ROUTES } from '@/constants';
-import { useDeleteStudents, useUpdateStudent } from '@/hooks/api';
+import {
+   useAddSubjectsStudent,
+   useDeleteStudents,
+   useUpdateStudent,
+} from '@/hooks/api';
 import { TQueryStudent, TStudent } from '@/types/student';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Row } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
-import { AddUpdateStudent } from '.';
+import { AddSubjectStudent, AddUpdateStudent } from '.';
 
 type Props = {
    row: Row<TStudent>;
@@ -26,8 +30,13 @@ export const RowActions = ({ row, q }: Props) => {
       useDeleteStudents(q);
    const { mutateAsync: updateStudent, isLoading: isUpdatingStudent } =
       useUpdateStudent(q);
+   const {
+      mutateAsync: addSubjectsStudent,
+      isLoading: isAddingSubjectsStudent,
+   } = useAddSubjectsStudent();
 
-   const isLoadingActions = isDeletingStudents || isUpdatingStudent;
+   const isLoadingActions =
+      isDeletingStudents || isUpdatingStudent || isAddingSubjectsStudent;
 
    return (
       <>
@@ -42,16 +51,27 @@ export const RowActions = ({ row, q }: Props) => {
                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[160px]">
-               <DropdownMenuItem>View detail</DropdownMenuItem>
                <DropdownMenuItem
                   onClick={() => {
-                     router.push(
-                        `${ROUTES.SUBJECTS}?studentId=${row.original.mssv}`
-                     );
+                     router.push(`${ROUTES.SCORES}?mssv=${row.original.mssv}`);
                   }}
                >
                   View student subjects
                </DropdownMenuItem>
+               <AddSubjectStudent
+                  isLoading={isAddingSubjectsStudent}
+                  onSubmit={async ({ values, onClose }) => {
+                     await addSubjectsStudent({
+                        mssv: row.original.mssv,
+                        subjectIds: values,
+                     });
+                     onClose?.();
+                  }}
+               >
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                     Add subjects
+                  </DropdownMenuItem>
+               </AddSubjectStudent>
                <AddUpdateStudent
                   title="Update student"
                   description="Update student information"

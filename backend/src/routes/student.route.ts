@@ -45,5 +45,6 @@ export class StudentRoute implements Routes {
       }),
       this.controller.deleteManyStudents,
     );
+    this.router.post(`${this.path}/add-subjects`, this.controller.addSubjects);
   }
 }

@@ -1,17 +1,22 @@
 {
-   "name": "tttn",
+   "name": "thuctaptotnghiep",
    "version": "1.0.0",
    "description": "",
    "main": "index.js",
    "scripts": {
-      "backend": "npm run dev --prefix backend",
-      "frontend": "npm run dev --prefix frontend",
-      "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-      "be:i": "npm install --prefix backend",
-      "fe:i": "npm install --prefix frontend",
-      "lint:fix": "concurrently \"npm run lint:fix --prefix backend\" \"npm run lint:fix --prefix frontend\""
+      "be:dev": "yarn --cwd backend dev",
+      "fe:dev": "yarn --cwd frontend dev",
+      "be:start": "yarn --cwd backend start",
+      "fe:start": "yarn --cwd frontend build && yarn --cwd frontend start",
+      "dev": "concurrently \"yarn run be:dev\" \"yarn run fe:dev\"",
+      "start": "concurrently \"yarn run be:start\" \"yarn run fe:start\"",
+      "be:i": "yarn --cwd backend install",
+      "fe:i": "yarn --cwd frontend install",
+      "lint:fix": "concurrently \"yarn --cwd backend lint:fix\" \"yarn --cwd frontend lint:fix\"",
+      "i": "concurrently \"yarn  be:i\" \"yarn  fe:i\"",
+      "docker": "cd ./backend && docker-compose up -d --build "
    },
-   "author": "",
+   "author": "hi02102002",
    "license": "ISC",
    "devDependencies": {
       "concurrently": "^8.2.1"

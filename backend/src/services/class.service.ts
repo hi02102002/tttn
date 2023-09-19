@@ -1,5 +1,5 @@
 import { db } from '@/db/prisma';
-import { CreateDto, QueryDto } from '@/dtos/classes';
+import { CreateDto, ExportDto, QueryDto } from '@/dtos/classes';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Prisma } from '@prisma/client';
@@ -145,8 +145,11 @@ export class ClassService {
     return classes;
   }
 
-  async exportAllClassesWithStudent() {
+  async exportAllClassesWithStudent({ classId }: ExportDto) {
     const classes = await db.class.findMany({
+      where: {
+        id: classId,
+      },
       include: {
         students: true,
       },

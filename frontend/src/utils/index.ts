@@ -19,3 +19,7 @@ export const getFullYear = (date: Date) => {
 export const toIds = (obj: Record<string, boolean>) => {
    return Object.keys(obj).filter((key) => obj[key]);
 };
+
+export const roundScore = (score: number) => {
+   return Math.round(score * 100) / 100;
+};
