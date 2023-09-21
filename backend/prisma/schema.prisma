@@ -15,11 +15,11 @@ datasource db {
 }
 
 model User {
-  id       String     @id @default(uuid()) @map("user_id")
-  username String     @unique
-  password String
-  student  Student?
-  UserRole UserRole[] // 1 user có nhiều role
+  id         String     @id @default(uuid()) @map("user_id")
+  username   String     @unique
+  password   String
+  student    Student?
+  usersRoles UserRole[] // 1 user có nhiều role
 }
 
 enum RoleName {
@@ -28,9 +28,11 @@ enum RoleName {
 }
 
 model Role {
-  id       String     @id @default(uuid()) @map("role_id")
-  name     RoleName   @unique
-  UserRole UserRole[] // 1 role có nhiều user
+  id        String     @id @default(uuid()) @map("role_id")
+  name      RoleName   @unique
+  userRoles UserRole[] // 1 role có nhiều user 
+
+  @@map("roles")
 }
 
 model UserRole {

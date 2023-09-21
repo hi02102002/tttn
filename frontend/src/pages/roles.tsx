@@ -31,6 +31,7 @@ const Roles: NextPageWithLayout = () => {
       () => [
          {
             accessorKey: 'id',
+            header: 'Id',
             name: 'Id',
             cell: ({ row }) => (
                <span className="font-medium">{row.original.id}</span>
@@ -47,17 +48,8 @@ const Roles: NextPageWithLayout = () => {
                <span className="font-medium">{row.original.name}</span>
             ),
          },
-         {
-            accessorKey: 'actions',
-            id: 'actions',
-            name: 'Actions',
-            header: 'Actions',
-            cell: ({ row }) => {
-               return <RowActions row={row} q={q} />;
-            },
-         },
       ],
-      [q]
+      []
    );
 
    return (
@@ -82,13 +74,7 @@ const Roles: NextPageWithLayout = () => {
                pageCount: calcPageCount(data?.total || 0, pagination.pageSize),
                isLoading,
             }}
-            DataToolbar={(table) => (
-               <TableToolbar
-                  table={table}
-                  //    renderFilterName={}
-                  q={q}
-               />
-            )}
+            DataToolbar={(table) => <TableToolbar table={table} q={q} />}
          />
       </div>
    );

@@ -1,7 +1,9 @@
 import { ClassController } from '@/controllers';
 import { CreateDto, DeleteDto, ExportDto, QueryDto, UpdateDto } from '@/dtos/classes';
 import { Routes } from '@/interfaces/routes.interface';
-import { validate } from '@/middlewares';
+import { AuthMiddleware, validate } from '@/middlewares';
+import { roles } from '@/middlewares/roles.middleware';
+import { RoleName } from '@prisma/client';
 import { Router } from 'express';
 
 export class ClassRoute implements Routes {
@@ -19,6 +21,8 @@ export class ClassRoute implements Routes {
       validate({
         type: ExportDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.exportClasses,
     );
     this.router.get(
@@ -27,14 +31,18 @@ export class ClassRoute implements Routes {
         type: QueryDto,
         typeInput: 'query',
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.getAllClasses,
     );
-    this.router.get(`${this.path}/:id`, this.controller.getClassById);
+    this.router.get(`${this.path}/:id`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.getClassById);
     this.router.post(
       `${this.path}`,
       validate({
         type: CreateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.createClass,
     );
     this.router.patch(
@@ -42,9 +50,11 @@ export class ClassRoute implements Routes {
       validate({
         type: UpdateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.updateClass,
     );
-    this.router.delete(`${this.path}/:id`, this.controller.deleteClass);
+    this.router.delete(`${this.path}/:id`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.deleteClass);
     this.router.delete(
       `${this.path}`,
       validate({

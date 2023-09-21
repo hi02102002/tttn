@@ -1,7 +1,9 @@
 import { ScoreController } from '@/controllers/score.controller';
 import { QueryDto, UpdateDto } from '@/dtos/score';
 import { Routes } from '@/interfaces/routes.interface';
-import { validate } from '@/middlewares';
+import { AuthMiddleware, validate } from '@/middlewares';
+import { roles } from '@/middlewares/roles.middleware';
+import { RoleName } from '@prisma/client';
 import { Router } from 'express';
 
 export class ScoreRoute implements Routes {
@@ -20,6 +22,8 @@ export class ScoreRoute implements Routes {
         type: QueryDto,
         typeInput: 'query',
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.getAllScores,
     );
     this.router.patch(
@@ -28,6 +32,8 @@ export class ScoreRoute implements Routes {
         type: UpdateDto,
         typeInput: 'body',
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.updateScoreStudent,
     );
   }

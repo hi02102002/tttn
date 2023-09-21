@@ -40,16 +40,6 @@ export const TableToolbar = ({ renderFilterName, table, q }: Props) => {
                })}
             >
                <DataTableViewOptions table={table} />
-               <AddUpdateRole
-                  onSubmit={async ({ values, onClose }) => {
-                     await createRole({
-                        name: values.name as unknown as RoleName,
-                     });
-                     onClose?.();
-                  }}
-               >
-                  <Button>Create role</Button>
-               </AddUpdateRole>
             </div>
          </div>
       </div>

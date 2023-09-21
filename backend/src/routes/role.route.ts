@@ -1,7 +1,9 @@
 import { RolesController } from '@/controllers';
 import { CreateDto, QueryDto, UpdateDto } from '@/dtos/roles';
 import { Routes } from '@/interfaces/routes.interface';
-import { validate } from '@/middlewares';
+import { AuthMiddleware, validate } from '@/middlewares';
+import { roles } from '@/middlewares/roles.middleware';
+import { RoleName } from '@prisma/client';
 import { Router } from 'express';
 export class RoleRoute implements Routes {
   path = '/roles';
@@ -21,6 +23,8 @@ export class RoleRoute implements Routes {
         type: QueryDto,
         typeInput: 'query',
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.getAllRoles,
     );
 
@@ -29,6 +33,8 @@ export class RoleRoute implements Routes {
       validate({
         type: CreateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.createRole,
     );
 
@@ -37,8 +43,16 @@ export class RoleRoute implements Routes {
       validate({
         type: UpdateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.updateRole,
     );
-    this.router.delete(`${this.path}/:id`, this.controller.deleteRole);
+    this.router.delete(
+      `${this.path}/:id`,
+
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
+      this.controller.deleteRole,
+    );
   }
 }

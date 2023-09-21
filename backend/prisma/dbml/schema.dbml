@@ -7,20 +7,20 @@ Table User {
   username String [unique, not null]
   password String [not null]
   student students
-  UserRole user_roles [not null]
+  usersRoles user_roles [not null]
 }
 
-Table Role {
+Table roles {
   id String [pk]
   name RoleName [unique, not null]
-  UserRole user_roles [not null]
+  userRoles user_roles [not null]
 }
 
 Table user_roles {
   userId String [not null]
   roleId String [not null]
   user User [not null]
-  role Role [not null]
+  role roles [not null]
 
   indexes {
     (userId, roleId) [pk]
@@ -81,7 +81,7 @@ Enum RoleName {
 
 Ref: user_roles.userId > User.id [delete: Cascade]
 
-Ref: user_roles.roleId > Role.id
+Ref: user_roles.roleId > roles.id
 
 Ref: students.classId > classes.id [delete: Cascade]
 

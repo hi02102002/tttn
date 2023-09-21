@@ -9,11 +9,14 @@ import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
+import Container from 'typedi';
+import { RolesService } from './services/roles.service';
 
 export class App {
   public app: express.Application;
   public env: string;
   public port: string | number;
+  public roleService = Container.get(RolesService);
 
   constructor(routes: Routes[]) {
     this.app = express();
@@ -23,6 +26,7 @@ export class App {
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.initializeErrorHandling();
+    this.roleService.seedRoles();
   }
 
   public listen() {
@@ -40,7 +44,7 @@ export class App {
 
   private initializeMiddlewares() {
     this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
+    this.app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());

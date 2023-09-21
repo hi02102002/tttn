@@ -9,6 +9,8 @@ export const ROUTES = {
    SUBJECTS: '/subjects',
    SCORES: '/scores',
    ROLES: '/roles',
+   403: '/403',
+   STUDENT_DASHBOARD: '/student-dashboard',
 };
 
 export const ENDPOINTS = {
@@ -17,4 +19,20 @@ export const ENDPOINTS = {
    CLASSES: '/classes',
    SUBJECTS: '/subjects',
    SCORES: '/scores',
+   AUTH: '/auths',
 };
+
+export const ADMIN_ROUTES = [
+   ROUTES.CLASSROOMS,
+   ROUTES.STUDENTS,
+   ROUTES.SUBJECTS,
+   ROUTES.SCORES,
+   ROUTES.ROLES,
+   ROUTES.HOME,
+];
+
+export const STUDENT_ROUTES = [ROUTES.STUDENT_DASHBOARD];
+
+export const AUTH_ROUTES = [ROUTES.LOGIN];
+
+export const API_URL = 'http://localhost:5000';

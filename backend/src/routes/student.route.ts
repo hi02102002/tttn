@@ -1,7 +1,9 @@
 import { StudentController } from '@/controllers';
 import { CreateDto, DeleteStudentsDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { Routes } from '@/interfaces/routes.interface';
-import { validate } from '@/middlewares';
+import { AuthMiddleware, validate } from '@/middlewares';
+import { roles } from '@/middlewares/roles.middleware';
+import { RoleName } from '@prisma/client';
 import { Router } from 'express';
 
 export class StudentRoute implements Routes {
@@ -20,14 +22,18 @@ export class StudentRoute implements Routes {
         type: QueryDto,
         typeInput: 'query',
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.getAllStudents,
     );
-    this.router.get(`${this.path}/:mssv`, this.controller.getStudentByMssv);
+    this.router.get(`${this.path}/:mssv`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.getStudentByMssv);
     this.router.post(
       `${this.path}`,
       validate({
         type: CreateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.createStudent,
     );
     this.router.patch(
@@ -35,6 +41,8 @@ export class StudentRoute implements Routes {
       validate({
         type: UpdateDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.updateStudent,
     );
     this.router.delete(`${this.path}/:mssv`, this.controller.deleteStudent);
@@ -43,8 +51,10 @@ export class StudentRoute implements Routes {
       validate({
         type: DeleteStudentsDto,
       }),
+      AuthMiddleware,
+      roles([RoleName.ADMIN]),
       this.controller.deleteManyStudents,
     );
-    this.router.post(`${this.path}/add-subjects`, this.controller.addSubjects);
+    this.router.post(`${this.path}/add-subjects`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.addSubjects);
   }
 }
