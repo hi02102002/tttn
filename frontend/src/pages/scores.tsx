@@ -5,10 +5,12 @@ import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
 import { httpServer } from '@/lib/axios';
 import { TClassroom } from '@/types/class';
+import { RoleName } from '@/types/role';
 import { TQueryScore, TScore } from '@/types/score';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
 import { TStudent } from '@/types/student';
 import { calcPageCount } from '@/utils';
+import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -158,7 +160,10 @@ Scores.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.ADMIN],
+})(async ({ ctx }) => {
    const mssv = ctx.query.mssv as string;
    const classId = ctx.query.classId as string;
 
@@ -203,6 +208,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
          classroom: _class,
       },
    };
-};
+});
 
 export default Scores;

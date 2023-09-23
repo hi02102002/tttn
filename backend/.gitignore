@@ -130,3 +130,4 @@ dist
 .pnp.*
 
 mysql
+tttn-firebase-admin.json

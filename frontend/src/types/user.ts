@@ -1,11 +1,16 @@
-export enum ERole {
-   ADMIN = 'ADMIN',
-   STUDENT = 'STUDENT',
-}
+import { RoleName } from './role';
+import { TStudent } from './student';
+
+export type TAvatar = {
+   id: string;
+   name: string;
+   url: string;
+   userId: string;
+};
 
 export type TRole = {
    id: string;
-   name: ERole;
+   name: RoleName;
 };
 
 export type TUserRole = {
@@ -19,4 +24,6 @@ export type TUser = {
    id: string;
    username: string;
    usersRoles: TUserRole[];
+   avatar: TAvatar;
+   student?: TStudent | null;
 };

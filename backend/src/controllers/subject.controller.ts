@@ -45,4 +45,15 @@ export class SubjectController {
       message: `Delete subject successfully`,
     });
   });
+
+  public getAverageScore = catchAsync(async (req, res) => {
+    const mssv = req.params.mssv as string;
+
+    const data = await this.subjectService.getAverageScoreByMssv(mssv);
+
+    res.status(StatusCodes.OK).json({
+      data,
+      message: `Get average score successfully`,
+    });
+  });
 }

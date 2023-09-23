@@ -23,8 +23,6 @@ export class AuthService {
         },
       });
 
-      console.log(role);
-
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await db.user.create({
@@ -40,6 +38,12 @@ export class AuthService {
               ],
             },
           },
+          avatar: {
+            create: {
+              url: `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
+              name: `username-${username}`,
+            },
+          },
         },
         select: {
           username: true,
@@ -49,6 +53,7 @@ export class AuthService {
               role: true,
             },
           },
+          avatar: true,
         },
       });
 
@@ -80,6 +85,7 @@ export class AuthService {
           },
         },
         student: true,
+        avatar: true,
       },
     });
 
@@ -138,6 +144,12 @@ export class AuthService {
         usersRoles: {
           include: {
             role: true,
+          },
+        },
+        avatar: true,
+        student: {
+          include: {
+            class: true,
           },
         },
       },

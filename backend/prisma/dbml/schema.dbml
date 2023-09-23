@@ -8,6 +8,7 @@ Table User {
   password String [not null]
   student students
   usersRoles user_roles [not null]
+  avatar files
 }
 
 Table roles {
@@ -25,6 +26,16 @@ Table user_roles {
   indexes {
     (userId, roleId) [pk]
   }
+}
+
+Table files {
+  id String [pk]
+  name String [unique, not null]
+  url String [unique, not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [default: `now()`, not null]
+  user User [not null]
+  userId String [unique, not null]
 }
 
 Table subjects {
@@ -82,6 +93,8 @@ Enum RoleName {
 Ref: user_roles.userId > User.id [delete: Cascade]
 
 Ref: user_roles.roleId > roles.id
+
+Ref: files.userId - User.id [delete: Cascade]
 
 Ref: students.classId > classes.id [delete: Cascade]
 

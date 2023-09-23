@@ -29,10 +29,13 @@ import {
 import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
 import { TClassroom, TClassroomQuery } from '@/types/class';
+import { RoleName } from '@/types/role';
 import { NextPageWithLayout } from '@/types/shared';
 import { calcPageCount } from '@/utils';
+import { withUser } from '@/utils/withUser';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 
@@ -322,5 +325,10 @@ const Classrooms: NextPageWithLayout = () => {
 Classrooms.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
+
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.ADMIN],
+})();
 
 export default Classrooms;

@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/contexts/theme.ctx';
+import { UserProvider } from '@/contexts/user.ctx';
 import '@/styles/globals.css';
 import { AppPropsWithLayout } from '@/types/shared';
 import {
@@ -14,6 +15,7 @@ import { Toaster } from 'sonner';
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
    const [queryClient] = useState(() => new QueryClient());
    const getLayout = Component.getLayout ?? ((page) => page);
+
    return (
       <>
          <NextNProgress
@@ -31,7 +33,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
                   enableSystem
                >
                   <Toaster position="top-center" theme="light" />
-                  {getLayout(<Component {...pageProps} />)}
+                  <UserProvider initUser={pageProps?.user || null}>
+                     {getLayout(<Component {...pageProps} />)}
+                  </UserProvider>
                </ThemeProvider>
             </Hydrate>
             <ReactQueryDevtools initialIsOpen={false} />

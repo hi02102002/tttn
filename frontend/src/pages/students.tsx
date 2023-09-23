@@ -10,9 +10,11 @@ import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
 import { httpServer } from '@/lib/axios';
 import { TClassroom } from '@/types/class';
+import { RoleName } from '@/types/role';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
 import { TQueryStudent, TStudent } from '@/types/student';
 import { calcPageCount } from '@/utils';
+import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
 import { useMemo, useState } from 'react';
@@ -179,7 +181,10 @@ Classrooms.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.STUDENT],
+})(async ({ ctx }) => {
    const classId = ctx.query.classId as string;
 
    if (!classId) {
@@ -218,6 +223,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
          },
       };
    }
-};
+});
 
 export default Classrooms;

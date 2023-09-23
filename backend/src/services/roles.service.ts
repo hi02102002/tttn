@@ -92,12 +92,6 @@ export class RolesService {
   }
 
   async seedRoles() {
-    const roles = await db.role.findMany();
-
-    if (roles.length > 0) {
-      return;
-    }
-
     await db.role.createMany({
       data: [
         {

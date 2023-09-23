@@ -3,10 +3,13 @@ import { DataTable, DataTableColumnHeader } from '@/components/ui';
 import { useSubjects } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
+import { RoleName } from '@/types/role';
 import { NextPageWithLayout } from '@/types/shared';
 import { TSubject, TSubjectQuery } from '@/types/subject';
 import { calcPageCount } from '@/utils';
+import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { GetServerSideProps } from 'next';
 import { useMemo, useState } from 'react';
 
 const Subjects: NextPageWithLayout = () => {
@@ -117,5 +120,10 @@ const Subjects: NextPageWithLayout = () => {
 Subjects.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
+
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.ADMIN],
+})();
 
 export default Subjects;

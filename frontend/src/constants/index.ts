@@ -4,6 +4,7 @@ export const ROUTES = {
    REGISTER: '/register',
    FORGOT_PASSWORD: '/forgot-password',
    RESET_PASSWORD: '/reset-password',
+   ADMIN: '/admin',
    CLASSROOMS: '/classrooms',
    STUDENTS: '/students',
    SUBJECTS: '/subjects',
@@ -11,6 +12,8 @@ export const ROUTES = {
    ROLES: '/roles',
    403: '/403',
    STUDENT_DASHBOARD: '/student-dashboard',
+   STUDENT_REGISTER_SUBJECTS: '/register-subjects',
+   STUDENT_UPDATE_PROFILE: '/update-profile',
 };
 
 export const ENDPOINTS = {
@@ -31,7 +34,10 @@ export const ADMIN_ROUTES = [
    ROUTES.HOME,
 ];
 
-export const STUDENT_ROUTES = [ROUTES.STUDENT_DASHBOARD];
+export const STUDENT_ROUTES = [
+   ROUTES.STUDENT_DASHBOARD,
+   ROUTES.STUDENT_REGISTER_SUBJECTS,
+];
 
 export const AUTH_ROUTES = [ROUTES.LOGIN];
 

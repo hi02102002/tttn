@@ -20,5 +20,8 @@
    "license": "ISC",
    "devDependencies": {
       "concurrently": "^8.2.1"
+   },
+   "dependencies": {
+      "recharts": "^2.8.0"
    }
 }

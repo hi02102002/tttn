@@ -19,3 +19,5 @@ export * from './use-create-role';
 export * from './use-update-role';
 export * from './use-delete-role';
 export * from './use-login';
+export * from './use-logout';
+export * from './use-me';

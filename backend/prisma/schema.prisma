@@ -20,6 +20,7 @@ model User {
   password   String
   student    Student?
   usersRoles UserRole[] // 1 user có nhiều role
+  avatar     File?
 }
 
 enum RoleName {
@@ -43,6 +44,18 @@ model UserRole {
 
   @@id([userId, roleId])
   @@map("user_roles")
+}
+
+model File {
+  id        String   @id @default(uuid()) @map("file_id")
+  name      String   @unique
+  url       String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+
+  @@map("files")
 }
 
 model Subject {

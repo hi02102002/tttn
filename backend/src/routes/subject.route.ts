@@ -16,6 +16,7 @@ export class SubjectRoute implements Routes {
   }
 
   public initializeRoutes() {
+    this.router.get(`${this.path}/average-score/:mssv`, AuthMiddleware, this.controller.getAverageScore);
     this.router.get(
       `${this.path}`,
       validate({

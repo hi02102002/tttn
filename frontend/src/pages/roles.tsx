@@ -3,10 +3,12 @@ import { DataTable, DataTableColumnHeader } from '@/components/ui';
 import { useRoles } from '@/hooks/api';
 import { useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
-import { TRole, TRoleQuery } from '@/types/role';
+import { RoleName, TRole, TRoleQuery } from '@/types/role';
 import { NextPageWithLayout } from '@/types/shared';
 import { calcPageCount } from '@/utils';
+import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
+import { GetServerSideProps } from 'next';
 import React, { useMemo, useState } from 'react';
 
 const Roles: NextPageWithLayout = () => {
@@ -83,5 +85,10 @@ const Roles: NextPageWithLayout = () => {
 Roles.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
+
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.ADMIN],
+})();
 
 export default Roles;

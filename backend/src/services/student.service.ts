@@ -7,10 +7,10 @@ import { StatusCodes } from 'http-status-codes';
 import 'reflect-metadata';
 import { Inject, Service } from 'typedi';
 import { ClassService } from './class.service';
+import { AuthService } from './auth.service';
 @Service()
 export class StudentService {
-  @Inject()
-  private readonly classService: ClassService;
+  constructor(private readonly classService: ClassService, private readonly authservice: AuthService) {}
 
   async getAllStudents(q?: QueryDto) {
     const { page, limit, name, address, classId, orderBy } = q || {};
@@ -84,10 +84,17 @@ export class StudentService {
       });
     }
 
+    const user = await this.authservice.register({
+      username: mssv,
+      password: mssv,
+      confirmPassword: mssv,
+    });
+
     const student = await db.student.create({
       data: {
         ...data,
         mssv,
+        userId: user.id,
       },
       include: {
         class: true,

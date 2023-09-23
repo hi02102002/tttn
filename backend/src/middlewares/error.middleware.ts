@@ -1,5 +1,5 @@
 import { HttpException } from '@/exceptions';
-import { logger } from '@utils/logger';
+import { logger } from '@/utils/logger';
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 

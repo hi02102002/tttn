@@ -1,7 +1,5 @@
 import { CREDENTIALS, LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from '@/configs';
 import { ErrorMiddleware, dbLogger, subjectSoftDelete } from '@/middlewares';
-import { Routes } from '@interfaces/routes.interface';
-import { logger, stream } from '@utils/logger';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,7 +8,9 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
 import Container from 'typedi';
-import { RolesService } from './services/roles.service';
+import { RolesService } from '@/services/roles.service';
+import { Routes } from '@/interfaces/routes.interface';
+import { logger, stream } from '@/utils/logger';
 
 export class App {
   public app: express.Application;

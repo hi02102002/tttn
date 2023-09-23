@@ -2,6 +2,7 @@ import { ENDPOINTS } from '@/constants';
 import { httpClient } from '@/lib/axios';
 import { TLoginDto } from '@/types/auth';
 import { TBaseResponse, TBaseService } from '@/types/shared';
+import { TUser } from '@/types/user';
 import axios from 'axios';
 
 class AuthService implements TBaseService {
@@ -16,8 +17,12 @@ class AuthService implements TBaseService {
       return res.data;
    }
 
-   async getMe(): Promise<TBaseResponse<any>> {
+   getMe(): Promise<TBaseResponse<TUser>> {
       return httpClient.get(`${this.endpoint}/me`);
+   }
+
+   logout(): Promise<TBaseResponse<any>> {
+      return axios.post(`/api/${this.endpoint}/logout`).then((res) => res.data);
    }
 }
 
