@@ -14,6 +14,7 @@ export const ROUTES = {
    STUDENT_DASHBOARD: '/student-dashboard',
    STUDENT_REGISTER_SUBJECTS: '/register-subjects',
    STUDENT_UPDATE_PROFILE: '/update-profile',
+   STUDENT_SCORES: '/student-scores',
 };
 
 export const ENDPOINTS = {

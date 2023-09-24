@@ -23,7 +23,7 @@ export class ScoreRoute implements Routes {
         typeInput: 'query',
       }),
       AuthMiddleware,
-      roles([RoleName.ADMIN]),
+      roles([RoleName.ADMIN, RoleName.STUDENT]),
       this.controller.getAllScores,
     );
     this.router.patch(

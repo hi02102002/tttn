@@ -23,7 +23,7 @@ type Props = {
    classroom: TClassroom | null;
 };
 
-const Classrooms: NextPageWithLayout<Props> = ({ classroom }) => {
+const Students: NextPageWithLayout<Props> = ({ classroom }) => {
    const [pagination, setPagination] = useState<PaginationState>({
       pageIndex: 0,
       pageSize: 10,
@@ -177,13 +177,13 @@ const Classrooms: NextPageWithLayout<Props> = ({ classroom }) => {
    );
 };
 
-Classrooms.getLayout = (page) => {
+Students.getLayout = (page) => {
    return <Layout>{page}</Layout>;
 };
 
 export const getServerSideProps: GetServerSideProps = withUser({
    isProtected: true,
-   roles: [RoleName.STUDENT],
+   roles: [RoleName.ADMIN],
 })(async ({ ctx }) => {
    const classId = ctx.query.classId as string;
 
@@ -225,4 +225,4 @@ export const getServerSideProps: GetServerSideProps = withUser({
    }
 });
 
-export default Classrooms;
+export default Students;

@@ -71,6 +71,7 @@ export class ScoreService {
             select: {
               name: true,
               id: true,
+              numCredits: true,
             },
           },
           id: true,

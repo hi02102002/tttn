@@ -1,4 +1,5 @@
 import { SubjectController } from '@/controllers';
+import { AddSubjectsStudentDto } from '@/dtos/students';
 import { CreateDto, QueryDto, UpdateDto } from '@/dtos/subjects';
 import { Routes } from '@/interfaces/routes.interface';
 import { AuthMiddleware, validate } from '@/middlewares';
@@ -17,6 +18,14 @@ export class SubjectRoute implements Routes {
 
   public initializeRoutes() {
     this.router.get(`${this.path}/average-score/:mssv`, AuthMiddleware, this.controller.getAverageScore);
+    this.router.post(
+      `${this.path}/register`,
+      AuthMiddleware,
+      roles([RoleName.STUDENT]),
+      validate({ typeInput: 'body', type: AddSubjectsStudentDto }),
+      this.controller.registerSubject,
+    );
+    this.router.get(`${this.path}/list-register`, AuthMiddleware, roles([RoleName.STUDENT, RoleName.ADMIN]), this.controller.getSubjectNotRegister);
     this.router.get(
       `${this.path}`,
       validate({

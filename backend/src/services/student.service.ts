@@ -5,7 +5,7 @@ import { pagination } from '@/utils/pagination';
 import { Class, Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import 'reflect-metadata';
-import { Inject, Service } from 'typedi';
+import { Service } from 'typedi';
 import { ClassService } from './class.service';
 import { AuthService } from './auth.service';
 @Service()
@@ -75,11 +75,32 @@ export class StudentService {
         mssv,
       },
     });
+
+    let userExist = await db.user.findUnique({
+      where: {
+        username: mssv,
+      },
+    });
+
+    let count = 0;
+
     while (studentExist) {
-      mssv = await this.generateMssv(_class);
+      count++;
+      mssv = await this.generateMssv(_class, count);
       studentExist = await db.student.findUnique({
         where: {
           mssv,
+        },
+      });
+    }
+
+    count = 0;
+    while (userExist) {
+      count++;
+      mssv = await this.generateMssv(_class, count);
+      userExist = await db.user.findUnique({
+        where: {
+          username: mssv,
         },
       });
     }
@@ -104,7 +125,7 @@ export class StudentService {
     return student;
   }
 
-  async generateMssv(_class: Class) {
+  async generateMssv(_class: Class, count = 0) {
     const classes = await db.class.findMany({
       where: {
         academicYear: _class.academicYear,
@@ -118,9 +139,10 @@ export class StudentService {
       },
     });
 
-    const numStudents = classes.reduce((acc, cur) => {
-      return acc + cur._count.students;
-    }, 0);
+    const numStudents =
+      classes.reduce((acc, cur) => {
+        return acc + cur._count.students;
+      }, 0) + count;
 
     const currentDate = new Date();
 

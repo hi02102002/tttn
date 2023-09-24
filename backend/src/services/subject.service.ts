@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 import { StudentService } from './student.service';
+import { AddSubjectsStudentDto } from '@/dtos/students';
 
 @Service()
 export class SubjectService {
@@ -199,8 +200,8 @@ export class SubjectService {
     SELECT 
       subjects.subject_id as subjectId,
       subjects.name AS subjectName,
-      AVG(COALESCE(scores.score,0)) AS averageScore,
-      COALESCE(student_score.score,0) AS studentScore
+      ROUND(AVG(COALESCE(scores.score,0)),2) AS averageScore,
+      ROUND(COALESCE(student_score.score),2) AS studentScore
     FROM subjects
     LEFT JOIN scores ON subjects.subject_id = scores.subject_id
     AND subjects.subject_id IN (
@@ -218,5 +219,51 @@ export class SubjectService {
       subjectName: string;
       averageScore: number;
     }>;
+  }
+
+  async getAllSubjectsNotOwnedByMssv(mssv: string) {
+    const subjects = await db.subject.findMany({
+      where: {
+        deletedAt: null,
+        NOT: {
+          scores: {
+            some: {
+              studentId: mssv,
+            },
+          },
+        },
+      },
+    });
+
+    return subjects;
+  }
+
+  async addSubjectToStudent(mssv: string, fields: AddSubjectsStudentDto) {
+    const student = await this.studentService.getStudentByMssv(mssv);
+
+    if (!student) {
+      throw new HttpException(StatusCodes.NOT_FOUND, 'Student not found');
+    }
+
+    const subjects = await db.subject.findMany({
+      where: {
+        id: {
+          in: fields.subjects,
+        },
+      },
+    });
+
+    if (subjects.length !== fields.subjects.length) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, `Some subjects not found`);
+    }
+
+    await db.score.createMany({
+      data: subjects.map(subject => ({
+        studentId: mssv,
+        subjectId: subject.id,
+        score: null,
+      })),
+      skipDuplicates: true,
+    });
   }
 }

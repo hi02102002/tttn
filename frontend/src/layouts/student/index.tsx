@@ -23,6 +23,11 @@ const Layout = ({ classNameMain, children }: Props) => {
                   name: 'Register subject',
                   path: ROUTES.STUDENT_REGISTER_SUBJECTS,
                },
+               {
+                  id: uuid(),
+                  name: 'Scores',
+                  path: ROUTES.STUDENT_SCORES,
+               },
             ]}
          />
          <main className={cn('container py-4', classNameMain)}>{children}</main>

@@ -18,7 +18,7 @@ type Props = {
    renderFilterName: () => React.ReactNode;
    table: Table<TScore>;
    q?: TQueryScore;
-   classroom: TClassroom;
+   classroom?: TClassroom;
 };
 
 export const TableToolbar = ({ renderFilterName, table, classroom }: Props) => {

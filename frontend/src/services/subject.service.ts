@@ -36,6 +36,16 @@ class SubjectService implements TBaseService {
    deleteSubjects(ids: string[]): Promise<TBaseResponse<TSubject[]>> {
       return httpClient.delete(this.endpoint, { data: { ids } });
    }
+
+   getSubjectsToRegister(): Promise<TBaseResponse<TSubject[]>> {
+      return httpClient.get(`${this.endpoint}/list-register`);
+   }
+
+   registerSubjects(data: {
+      subjects: string[];
+   }): Promise<TBaseResponse<null>> {
+      return httpClient.post(`${this.endpoint}/register`, data);
+   }
 }
 
 export const subjectService = new SubjectService();

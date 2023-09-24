@@ -65,6 +65,16 @@ export const Header = ({ items }: Props) => {
                                  : `Student: ${user?.username}`}
                            </DropdownMenuLabel>
                            <DropdownMenuSeparator />
+                           {!isAdmin && (
+                              <>
+                                 <DropdownMenuItem>
+                                    Update profile
+                                 </DropdownMenuItem>
+                                 <DropdownMenuItem>
+                                    Change password
+                                 </DropdownMenuItem>
+                              </>
+                           )}
                            <DropdownMenuItem onClick={() => logout()}>
                               Logout
                            </DropdownMenuItem>

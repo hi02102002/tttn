@@ -1,12 +1,182 @@
+import {
+   Button,
+   Checkbox,
+   Form,
+   FormControl,
+   FormField,
+   FormItem,
+   FormLabel,
+   LoadingFullpage,
+   Table,
+   TableBody,
+   TableCell,
+   TableHead,
+   TableHeader,
+   TableRow,
+} from '@/components/ui';
+import { ENDPOINTS } from '@/constants';
+import { useListSubjectToRegister, useRegisterSubjects } from '@/hooks/api';
 import Layout from '@/layouts/student';
-import { NextPageWithLayout } from '@/types/shared';
+import { httpServer } from '@/lib/axios';
+import { RoleName } from '@/types/role';
+import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
+import { TSubject } from '@/types/subject';
+import { withUser } from '@/utils/withUser';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { GetServerSideProps } from 'next';
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
-type Props = {};
-
-const RegisterSubjects: NextPageWithLayout<Props> = () => {
-   return <div>RegisterSubjects</div>;
+type Props = {
+   subjects: Array<TSubject>;
 };
+
+const schema = z.object({
+   subjects: z.array(z.string()).refine((value) => value.some((item) => item), {
+      message: 'You have to select at least one subject.',
+   }),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+const RegisterSubjects: NextPageWithLayout<Props> = ({
+   subjects: initSubjects,
+}) => {
+   const { data: subjects } = useListSubjectToRegister(initSubjects);
+   const form = useForm<FormValues>({
+      resolver: zodResolver(schema),
+      defaultValues: {
+         subjects: [],
+      },
+   });
+
+   const { mutateAsync: registerSubjects, isLoading: isRegisteringSubjects } =
+      useRegisterSubjects();
+
+   const onSubmit = async (values: FormValues) => {
+      await registerSubjects(values.subjects);
+   };
+
+   return (
+      <>
+         {isRegisteringSubjects && <LoadingFullpage />}
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Register Subjects</h2>
+               <p className="text-muted-foreground">
+                  List of subjects that you can register to study.
+               </p>
+            </div>
+            <div>
+               <Form {...form}>
+                  <form
+                     className="space-y-4"
+                     onSubmit={form.handleSubmit(onSubmit)}
+                  >
+                     <Table>
+                        <TableHeader>
+                           <TableRow>
+                              <TableHead></TableHead>
+                              <TableHead className="whitespace-nowrap">
+                                 Subject
+                              </TableHead>
+                              <TableHead className="whitespace-nowrap">
+                                 Number of credits
+                              </TableHead>
+                           </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                           {subjects && subjects?.length === 0 ? (
+                              <TableRow>
+                                 <TableCell colSpan={3}>
+                                    <p className="flex items-center justify-center font-medium text-muted-foreground p-4">
+                                       Not found any subjects to register.
+                                    </p>
+                                 </TableCell>
+                              </TableRow>
+                           ) : (
+                              subjects?.map((subject) => (
+                                 <FormField
+                                    key={subject.id}
+                                    control={form.control}
+                                    name="subjects"
+                                    render={({ field }) => {
+                                       return (
+                                          <TableRow key={subject.id}>
+                                             <TableCell className="font-medium">
+                                                <Checkbox
+                                                   checked={field.value?.includes(
+                                                      subject.id
+                                                   )}
+                                                   onCheckedChange={(
+                                                      checked
+                                                   ) => {
+                                                      return checked
+                                                         ? field.onChange([
+                                                              ...field.value,
+                                                              subject.id,
+                                                           ])
+                                                         : field.onChange(
+                                                              field.value?.filter(
+                                                                 (value) =>
+                                                                    value !==
+                                                                    subject.id
+                                                              )
+                                                           );
+                                                   }}
+                                                />
+                                             </TableCell>
+                                             <TableCell className="font-medium">
+                                                {subject.name}
+                                             </TableCell>
+                                             <TableCell>
+                                                {subject.numCredits}
+                                             </TableCell>
+                                          </TableRow>
+                                       );
+                                    }}
+                                 />
+                              ))
+                           )}
+                        </TableBody>
+                     </Table>
+                     <div className="flex items-center justify-end">
+                        <Button
+                           type="submit"
+                           disabled={!form.formState.isValid}
+                           className="select-none"
+                        >
+                           Register subjects
+                        </Button>
+                     </div>
+                  </form>
+               </Form>
+            </div>
+         </div>
+      </>
+   );
+};
+
+export const getServerSideProps: GetServerSideProps = withUser({
+   isProtected: true,
+   roles: [RoleName.STUDENT],
+})(async ({ user, token }) => {
+   const res: TBaseResponse<Array<TSubject>> = await httpServer.get(
+      `${ENDPOINTS.SUBJECTS}/list-register`,
+      {
+         headers: {
+            Authorization: `Bearer ${token}`,
+         },
+      }
+   );
+
+   return {
+      props: {
+         subjects: res.data,
+      },
+   };
+});
 
 RegisterSubjects.getLayout = (page) => {
    return <Layout>{page}</Layout>;

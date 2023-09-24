@@ -1,3 +1,4 @@
+import { TRequestWithUser } from '@/interfaces/common.type';
 import { SubjectService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
 import { StatusCodes } from 'http-status-codes';
@@ -54,6 +55,28 @@ export class SubjectController {
     res.status(StatusCodes.OK).json({
       data,
       message: `Get average score successfully`,
+    });
+  });
+
+  public getSubjectNotRegister = catchAsync(async (req: TRequestWithUser, res) => {
+    const mssv = req.user.username;
+
+    const data = await this.subjectService.getAllSubjectsNotOwnedByMssv(mssv);
+
+    res.status(StatusCodes.OK).json({
+      data,
+      message: `Get subject not register successfully`,
+    });
+  });
+
+  public registerSubject = catchAsync(async (req: TRequestWithUser, res) => {
+    const mssv = req.user.username;
+
+    const data = await this.subjectService.addSubjectToStudent(mssv, req.body);
+
+    res.status(StatusCodes.OK).json({
+      data,
+      message: `Register subjects successfully`,
     });
   });
 }
