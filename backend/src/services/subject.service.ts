@@ -209,7 +209,7 @@ export class SubjectService {
         FROM scores
         WHERE mssv = ${mssv} -- Replace with the specific student's mssv
     )
-    LEFT JOIN scores AS student_score ON subjects.subject_id = student_score.subject_id
+    INNER JOIN scores AS student_score ON subjects.subject_id = student_score.subject_id
     AND student_score.mssv = ${mssv} -- Replace with the specific student's mssv
     GROUP BY subjects.subject_id, subjects.name, student_score.score
     `;
