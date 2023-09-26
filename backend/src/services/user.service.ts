@@ -20,7 +20,7 @@ export class UserService {
       throw new HttpException(StatusCodes.NOT_FOUND, `User with this id not found`);
     }
 
-    const avatar = await this.fileService.createAvatar(userId, file);
+    const avatar = await this.fileService.uploadAvatar(userId, file);
 
     return avatar;
   }

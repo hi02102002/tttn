@@ -9,6 +9,8 @@ export class UserController {
   public uploadAvatar = catchAsync(async (req: TRequestWithUser, res) => {
     const userId = req.user.id;
 
+    console.log('req.file', req.file);
+
     const avatar = await this.userService.uploadAvatar(userId, req.file);
 
     res.status(200).json({

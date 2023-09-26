@@ -26,6 +26,8 @@ export class FirebaseService {
   }
 
   async uploadFile(file: Express.Multer.File) {
+    console.log(file);
+
     const token = uuid();
     const metadata = {
       metadata: {
@@ -45,9 +47,11 @@ export class FirebaseService {
   }
 
   async deleteFile(url: string) {
-    const imagePath: string = this.getPathStorageFromUrl(url);
+    try {
+      const imagePath: string = this.getPathStorageFromUrl(url);
 
-    await this.bucket.file(imagePath).delete();
+      await this.bucket.file(imagePath).delete();
+    } catch (error) {}
   }
 
   private getPathStorageFromUrl(url: String) {

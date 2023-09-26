@@ -13,6 +13,27 @@ class UsersService implements TBaseService {
    updateProfile(data: TUpdateProfileDto): Promise<TBaseResponse<null>> {
       return httpClient.post(`${this.endpoint}/update-profile`, data);
    }
+
+   async changeAvatar(
+      file: File | Blob | string
+   ): Promise<TBaseResponse<null>> {
+      if (typeof file === 'string') {
+         const res = await fetch(file);
+
+         const contentType = res.headers.get('Content-Type') as string;
+         const blob = await res.blob();
+
+         file = new File([blob], 'avatar', { type: contentType });
+      }
+
+      const formData = new FormData();
+      formData.append('avatar', file);
+      return httpClient.post(`${this.endpoint}/change-avatar`, formData, {
+         headers: {
+            'Content-Type': 'multipart/form-data',
+         },
+      });
+   }
 }
 
 export const usersService = new UsersService();

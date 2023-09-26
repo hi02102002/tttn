@@ -25,3 +25,4 @@ export * from './use-register-subjects';
 export * from './use-list-subject-to-register';
 export * from './use-change-password';
 export * from './use-update-profile';
+export * from './use-upload-avatar';

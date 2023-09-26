@@ -19,12 +19,17 @@ import {
    Input,
 } from '@/components/ui';
 import { useUser } from '@/contexts/user.ctx';
-import { useChangePassword, useUpdateProfile } from '@/hooks/api';
+import {
+   useChangePassword,
+   useUpdateProfile,
+   useUploadAvatar,
+} from '@/hooks/api';
 import Layout from '@/layouts/student';
 import { RoleName } from '@/types/role';
 import { NextPageWithLayout } from '@/types/shared';
 import { withUser } from '@/utils/withUser';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { IconLoader2 } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -95,6 +100,8 @@ const UpdateProfile: NextPageWithLayout = () => {
       useChangePassword();
    const { mutateAsync: updateProfile, isLoading: isUpdateProfileLoading } =
       useUpdateProfile();
+   const { mutateAsync: uploadAvatar, isLoading: isUploadAvatarLoading } =
+      useUploadAvatar();
 
    const handleChangePassword = async (values: PasswordFormValues) => {
       await changePassword(values);
@@ -104,6 +111,9 @@ const UpdateProfile: NextPageWithLayout = () => {
          confirmPassword: '',
       });
    };
+
+   const avatarRef = React.useRef<HTMLInputElement | null>(null);
+   const [avatar, setAvatar] = React.useState<string | null>(null);
 
    const handleUpdateProfile = async (values: AddressFormValues) => {
       await updateProfile(values);
@@ -174,15 +184,51 @@ const UpdateProfile: NextPageWithLayout = () => {
                            files.
                         </p>
                      </div>
-                     <Avatar className="h-24 w-24 cursor-pointer">
+                     <Avatar className="h-24 w-24 cursor-pointer relative">
+                        <input
+                           type="file"
+                           className="hidden"
+                           accept="image/*"
+                           ref={avatarRef}
+                           onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setAvatar(URL.createObjectURL(file));
+                              uploadAvatar(file, {
+                                 onSuccess: () => {
+                                    if (avatarRef.current) {
+                                       avatarRef.current.value = '';
+                                    }
+                                 },
+                                 onError: () => {
+                                    if (avatarRef.current) {
+                                       avatarRef.current.value = '';
+                                    }
+                                    setAvatar(null);
+                                 },
+                              });
+                           }}
+                        />
                         <AvatarImage
-                           src={user?.avatar?.url}
+                           src={avatar || user?.avatar.url}
                            alt={user?.username}
                            draggable={false}
+                           onClick={() => avatarRef.current?.click()}
                         />
                         <AvatarFallback>
                            {user?.username?.charAt(0).toUpperCase()}
                         </AvatarFallback>
+                        {isUploadAvatarLoading && (
+                           <div>
+                              <div className="absolute inset-0 bg-background/0 backdrop-blur-sm"></div>
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                 <IconLoader2
+                                    className="animate-spin"
+                                    size={24}
+                                 />
+                              </div>
+                           </div>
+                        )}
                      </Avatar>
                   </div>
                </SectionBody>
@@ -231,7 +277,12 @@ const UpdateProfile: NextPageWithLayout = () => {
                   </div>
                </SectionBody>
                <SectionInfoFooter>
-                  <Button form="address-form" type="submit" className="ml-auto">
+                  <Button
+                     form="address-form"
+                     type="submit"
+                     className="ml-auto"
+                     loading={isUpdateProfileLoading}
+                  >
                      Save
                   </Button>
                </SectionInfoFooter>
