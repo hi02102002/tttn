@@ -43,6 +43,7 @@ export const withUser: TWithUser = (options) => (gssp) => async (ctx) => {
    let user: TUser | null = null;
 
    try {
+      console.log('accessToken', accessToken);
       const resUser: TBaseResponse<TUser> = await httpServer.get(
          `${ENDPOINTS.AUTH}/me`,
          {
@@ -53,6 +54,7 @@ export const withUser: TWithUser = (options) => (gssp) => async (ctx) => {
       );
       user = resUser?.data || null;
    } catch (error) {
+      console.log(error);
       deleteCookie('accessToken', { req, res });
       user = null;
    }

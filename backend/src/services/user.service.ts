@@ -3,8 +3,11 @@ import { FileService } from './file.service';
 import { HttpException } from '@/exceptions';
 import { db } from '@/db/prisma';
 import { StatusCodes } from 'http-status-codes';
-import { ChangePassDto } from '@/dtos/users';
+import { ChangePassDto, UpdateProfileDto } from '@/dtos/users';
 import * as bcrypt from 'bcrypt';
+import { TUser } from '@/interfaces/common.type';
+import { RoleName } from '@prisma/client';
+import { omit } from 'lodash';
 
 @Service()
 export class UserService {
@@ -39,7 +42,7 @@ export class UserService {
       throw new HttpException(StatusCodes.NOT_FOUND, `User with this id not found`);
     }
 
-    const isMatch = await bcrypt.compare(user.password, user.password);
+    const isMatch = await bcrypt.compare(body.oldPassword, user.password);
 
     if (!isMatch) {
       throw new HttpException(StatusCodes.BAD_REQUEST, `Your password is incorrect`);
@@ -55,5 +58,41 @@ export class UserService {
         password: newPassword,
       },
     });
+  }
+
+  async updateProfile(_user: TUser, body: UpdateProfileDto) {
+    const isStudent = _user.usersRoles.some(ur => ur.role.name === RoleName.STUDENT);
+
+    if (!isStudent) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, `You are not a student`);
+    }
+
+    const student = await db.student.findUnique({
+      where: {
+        userId: _user.id,
+      },
+    });
+
+    if (!student) {
+      throw new HttpException(StatusCodes.NOT_FOUND, `Student with this id not found`);
+    }
+
+    const updatedStudent = await db.user.update({
+      where: {
+        id: _user.id,
+      },
+      data: {
+        student: {
+          update: {
+            address: body.address,
+          },
+        },
+      },
+      include: {
+        student: true,
+      },
+    });
+
+    return omit(updatedStudent, ['password']);
   }
 }

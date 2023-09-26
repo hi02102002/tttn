@@ -23,3 +23,5 @@ export * from './use-logout';
 export * from './use-me';
 export * from './use-register-subjects';
 export * from './use-list-subject-to-register';
+export * from './use-change-password';
+export * from './use-update-profile';

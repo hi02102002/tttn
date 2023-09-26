@@ -8,3 +8,5 @@ export class HttpException extends Error {
     this.message = message;
   }
 }
+
+process.env.DATABASE_URL;

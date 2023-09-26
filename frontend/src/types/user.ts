@@ -27,3 +27,7 @@ export type TUser = {
    avatar: TAvatar;
    student?: TStudent | null;
 };
+
+export type TUpdateProfileDto = {
+   address?: string;
+};

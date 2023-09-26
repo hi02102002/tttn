@@ -105,6 +105,8 @@ export class StudentService {
       });
     }
 
+    console.log(mssv);
+
     const user = await this.authservice.register({
       username: mssv,
       password: mssv,

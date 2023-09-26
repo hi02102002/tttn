@@ -8,3 +8,9 @@ export type TRegisterDto = {
    password: string;
    confirmPassword: string;
 };
+
+export type TChangePasswordDto = {
+   oldPassword: string;
+   newPassword: string;
+   confirmPassword: string;
+};

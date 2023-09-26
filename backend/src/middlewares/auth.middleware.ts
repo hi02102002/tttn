@@ -22,6 +22,8 @@ export const AuthMiddleware = async (req: TRequestWithUser, res: Response, next:
   try {
     const Authorization = getAuthorization(req);
 
+    console.log('Authorization', Authorization);
+
     if (Authorization) {
       const { id } = (await verify(Authorization, JWT_ACCESS_SECRET_KEY)) as TDataStoredInToken;
 
@@ -46,6 +48,7 @@ export const AuthMiddleware = async (req: TRequestWithUser, res: Response, next:
       next(new HttpException(StatusCodes.UNAUTHORIZED, 'Token missing. Please login again'));
     }
   } catch (error) {
+    console.log(error);
     next(new HttpException(StatusCodes.UNAUTHORIZED, 'Wrong authentication token'));
   }
 };

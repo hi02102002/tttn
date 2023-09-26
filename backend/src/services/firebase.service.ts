@@ -16,7 +16,8 @@ export class FirebaseService {
     const _admin = firebase.initializeApp({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      credential: admin.credential.cert(cert),
+      credential: firebase.credential.cert(cert),
+      storageBucket: 'tttn-1614e.appspot.com',
     });
 
     this.admin = _admin;

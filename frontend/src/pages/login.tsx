@@ -9,13 +9,8 @@ import {
    Input,
 } from '@/components/ui';
 import { useLogin } from '@/hooks/api';
-import { RoleName } from '@/types/role';
 import { zodResolver } from '@hookform/resolvers/zod';
-import jwtDecode from 'jwt-decode';
 import { GraduationCap } from 'lucide-react';
-
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 

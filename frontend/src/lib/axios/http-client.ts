@@ -29,7 +29,7 @@ httpClient.interceptors.response.use(
    function (response) {
       return response.data;
    },
-   function (error) {
+   async function (error) {
       return Promise.reject(error);
    }
 );

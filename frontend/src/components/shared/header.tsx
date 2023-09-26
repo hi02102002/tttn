@@ -19,6 +19,7 @@ import Nav from './nav';
 import { useLogout, useMe } from '@/hooks/api';
 import { useUser } from '@/contexts/user.ctx';
 import { RoleName } from '@/types/role';
+import { useRouter } from 'next/router';
 
 type Props = {
    items?: TNavItem[];
@@ -31,6 +32,8 @@ export const Header = ({ items }: Props) => {
    const isAdmin = user?.usersRoles?.some((ur) =>
       ur.role.name.includes(RoleName.ADMIN)
    );
+
+   const router = useRouter();
 
    return (
       <>
@@ -67,11 +70,14 @@ export const Header = ({ items }: Props) => {
                            <DropdownMenuSeparator />
                            {!isAdmin && (
                               <>
-                                 <DropdownMenuItem>
+                                 <DropdownMenuItem
+                                    onClick={() => {
+                                       router.push(
+                                          ROUTES.STUDENT_UPDATE_PROFILE
+                                       );
+                                    }}
+                                 >
                                     Update profile
-                                 </DropdownMenuItem>
-                                 <DropdownMenuItem>
-                                    Change password
                                  </DropdownMenuItem>
                               </>
                            )}
