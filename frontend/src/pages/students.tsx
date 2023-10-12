@@ -8,7 +8,7 @@ import {
 import { useDeleteStudents, useStudents } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
-import { httpServer } from '@/lib/axios';
+import http_server from '@/lib/axios/http-server';
 import { TClassroom } from '@/types/class';
 import { RoleName } from '@/types/role';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
@@ -123,6 +123,8 @@ const Students: NextPageWithLayout<Props> = ({ classroom }) => {
             cell: ({ row }) => {
                return <RowActions row={row} q={q} />;
             },
+            enableHiding: false,
+            enableSorting: false,
          },
       ],
       [q]
@@ -184,7 +186,7 @@ Students.getLayout = (page) => {
 export const getServerSideProps: GetServerSideProps = withUser({
    isProtected: true,
    roles: [RoleName.ADMIN],
-})(async ({ ctx }) => {
+})(async ({ ctx, token }) => {
    const classId = ctx.query.classId as string;
 
    if (!classId) {
@@ -196,7 +198,7 @@ export const getServerSideProps: GetServerSideProps = withUser({
    }
 
    try {
-      const res: TBaseResponse<TClassroom> = await httpServer.get(
+      const res: TBaseResponse<TClassroom> = await http_server(ctx)(
          `/classes/${classId}`
       );
 
@@ -216,7 +218,6 @@ export const getServerSideProps: GetServerSideProps = withUser({
          },
       };
    } catch (error) {
-      console.log(error);
       return {
          props: {
             classroom: null,

@@ -58,4 +58,13 @@ export class StudentController {
       message: `Add subjects to student with MSSV ${req.body.mssv} successfully`,
     });
   });
+
+  public exportSubjectStudent = catchAsync(async (req, res) => {
+    const workbook = await this.studentService.exportSubjectStudent(req.params.mssv);
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=dsd.xlsx');
+
+    await workbook.xlsx.write(res);
+  });
 }

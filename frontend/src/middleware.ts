@@ -20,21 +20,23 @@ export async function middleware(request: NextRequest) {
 
    // if have access token and this route is auth route, redirect to home
 
+   const decoded = jwt_decode(accessToken) as {
+      id: string;
+      roles: RoleName[];
+   };
+
+   const isAdmin = decoded?.roles.includes(RoleName.ADMIN);
+
    if (accessToken && AUTH_ROUTES.includes(request.nextUrl.pathname)) {
-      const decoded = jwt_decode(accessToken) as {
-         id: string;
-         roles: RoleName[];
-      };
-
-      const isAdmin = decoded.roles.includes(RoleName.ADMIN);
-
       return NextResponse.redirect(
          new URL(isAdmin ? ROUTES.HOME : ROUTES.STUDENT_DASHBOARD, request.url)
       );
    }
 
    if (request.nextUrl.pathname === ROUTES.HOME) {
-      return NextResponse.redirect(new URL(ROUTES.ADMIN, request.url));
+      return NextResponse.redirect(
+         new URL(isAdmin ? ROUTES.ADMIN : ROUTES.STUDENT_DASHBOARD, request.url)
+      );
    }
 
    return NextResponse.next();

@@ -29,5 +29,13 @@ export class AuthRote implements Routes {
       this.controller.register,
     );
     this.router.get(`${this.path}/me`, AuthMiddleware, this.controller.getMe);
+
+    this.router.post(
+      `${this.path}/register-admin`,
+      validate({
+        type: RegisterDto,
+      }),
+      this.controller.registerAdmin,
+    );
   }
 }

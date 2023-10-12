@@ -1,5 +1,5 @@
 import { AUTH_ROUTES, ENDPOINTS, ROUTES } from '@/constants';
-import { httpServer } from '@/lib/axios';
+import http_server from '@/lib/axios/http-server';
 import { RoleName } from '@/types/role';
 import { TBaseResponse } from '@/types/shared';
 import { TUser } from '@/types/user';
@@ -43,18 +43,11 @@ export const withUser: TWithUser = (options) => (gssp) => async (ctx) => {
    let user: TUser | null = null;
 
    try {
-      console.log('accessToken', accessToken);
-      const resUser: TBaseResponse<TUser> = await httpServer.get(
-         `${ENDPOINTS.AUTH}/me`,
-         {
-            headers: {
-               Authorization: `Bearer ${accessToken}`,
-            },
-         }
+      const resUser: TBaseResponse<TUser> = await http_server(ctx)(
+         `${ENDPOINTS.AUTH}/me`
       );
       user = resUser?.data || null;
    } catch (error) {
-      console.log(error);
       deleteCookie('accessToken', { req, res });
       user = null;
    }

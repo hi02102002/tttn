@@ -16,7 +16,7 @@ const Layout = ({ classNameMain, children }: Props) => {
                {
                   id: uuid(),
                   name: 'Home',
-                  path: ROUTES.HOME,
+                  path: ROUTES.ADMIN,
                },
                {
                   id: uuid(),
@@ -42,6 +42,11 @@ const Layout = ({ classNameMain, children }: Props) => {
                   id: uuid(),
                   name: 'Roles',
                   path: ROUTES.ROLES,
+               },
+               {
+                  id: uuid(),
+                  name: 'Users',
+                  path: ROUTES.USERS,
                },
             ]}
          />

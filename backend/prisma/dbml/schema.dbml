@@ -6,9 +6,12 @@ Table User {
   id String [pk]
   username String [unique, not null]
   password String [not null]
-  student students
   usersRoles user_roles [not null]
   avatar files
+  fullName String
+  status UserStatus [not null, default: 'ACTIVE']
+  student students
+  studentId String [unique]
 }
 
 Table roles {
@@ -68,8 +71,7 @@ Table students {
   classId String [not null]
   class classes [not null]
   scores scores [not null]
-  user User [not null]
-  userId String [unique, not null]
+  user User
 }
 
 Table scores {
@@ -85,10 +87,17 @@ Table scores {
   }
 }
 
+Enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
 Enum RoleName {
   ADMIN
   STUDENT
 }
+
+Ref: User.studentId - students.mssv [delete: Cascade]
 
 Ref: user_roles.userId > User.id [delete: Cascade]
 
@@ -97,8 +106,6 @@ Ref: user_roles.roleId > roles.id
 Ref: files.userId - User.id [delete: Cascade]
 
 Ref: students.classId > classes.id [delete: Cascade]
-
-Ref: students.userId - User.id
 
 Ref: scores.studentId > students.mssv [delete: Cascade]
 

@@ -1,7 +1,6 @@
 import { Match } from '@/utils/match';
 import { OnlyTextNumber } from '@/utils/only-text-number';
-import { StartsWithLetter } from '@/utils/start-with-letter';
-import { IsNotEmpty, IsString, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -25,4 +24,12 @@ export class RegisterDto {
     message: "Confirm password don't match",
   })
   confirmPassword: string;
+
+  @IsString()
+  @IsNotEmpty()
+  fullName: string;
+
+  @IsString()
+  @IsOptional()
+  studentId: string;
 }

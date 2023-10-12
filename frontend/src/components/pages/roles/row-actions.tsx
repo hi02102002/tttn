@@ -7,9 +7,8 @@ import {
    DropdownMenuTrigger,
    LoadingFullpage,
 } from '@/components/ui';
-import { useDeleteRole, useUpdateRole, useUpdateScore } from '@/hooks/api';
+import { useDeleteRole, useUpdateRole } from '@/hooks/api';
 import { RoleName, TRole, TRoleQuery } from '@/types/role';
-import { TQueryScore, TScore } from '@/types/score';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Row } from '@tanstack/react-table';
 import { AddUpdateRole } from '.';

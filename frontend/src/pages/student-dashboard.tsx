@@ -1,45 +1,46 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
-import { ENDPOINTS, ROUTES } from '@/constants';
+import { ENDPOINTS } from '@/constants';
+import { useUser } from '@/contexts/user.ctx';
 import Layout from '@/layouts/student';
-import { httpServer } from '@/lib/axios';
+import http_server from '@/lib/axios/http-server';
 import { RoleName } from '@/types/role';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
-import { TUser } from '@/types/user';
+import { TStudent } from '@/types/student';
 import { withUser } from '@/utils/withUser';
 import { GetServerSideProps } from 'next';
-import React from 'react';
 import {
-   BarChart,
    Bar,
-   Cell,
+   CartesianGrid,
+   ComposedChart,
+   Legend,
+   Line,
+   ResponsiveContainer,
+   Tooltip,
    XAxis,
    YAxis,
-   CartesianGrid,
-   Tooltip,
-   Legend,
-   ResponsiveContainer,
-   ComposedChart,
-   Line,
 } from 'recharts';
 type Props = {
-   user: TUser;
    avgSubjects: Array<{
       averageScore: number;
       subjectId: string;
       subjectName: string;
       studentScore: number;
    }>;
+   student: TStudent;
 };
 
-const StudentDashboard: NextPageWithLayout<Props> = ({ user, avgSubjects }) => {
-   console.log(avgSubjects);
+const StudentDashboard: NextPageWithLayout<Props> = ({
+   student,
+   avgSubjects,
+}) => {
+   const { user } = useUser();
+
    return (
       <div className="space-y-4">
          <div>
-            <h2 className="text-2xl font-semibold ">Student Dashboard</h2>
+            <h2 className="text-2xl font-semibold ">Hello {student?.name}</h2>
             <p className="text-muted-foreground">
-               Your information will be displayed here. You can edit your
-               profile here.
+               Welcome to the student dashboard
             </p>
          </div>
          <div className="flex flex-col gap-4">
@@ -56,19 +57,19 @@ const StudentDashboard: NextPageWithLayout<Props> = ({ user, avgSubjects }) => {
                   <div className="flex flex-col gap-2 w-full">
                      <span>
                         <span className="font-medium">Name: </span>
-                        <span>{user?.student?.name}</span>
+                        <span>{student?.name}</span>
                      </span>
                      <span>
                         <span className="font-medium">MSSV: </span>
-                        <span>{user?.student?.mssv}</span>
+                        <span>{student?.mssv}</span>
                      </span>
                      <span>
                         <span className="font-medium">Class: </span>
-                        <span>{user?.student?.class.name}</span>
+                        <span>{student?.class.name}</span>
                      </span>
                      <span>
                         <span className="font-medium">Address: </span>
-                        <span>{user?.student?.address}</span>
+                        <span>{student?.address}</span>
                      </span>
                   </div>
                </div>
@@ -124,25 +125,52 @@ StudentDashboard.getLayout = (page) => {
 export const getServerSideProps: GetServerSideProps = withUser({
    isProtected: true,
    roles: [RoleName.STUDENT],
-})(async ({ user, token }) => {
+})(async ({ user, ctx }) => {
    const mssv = user?.student?.mssv || user?.username;
 
-   const res: TBaseResponse<
-      Array<{
-         averageScore: number;
-         subjectId: string;
-         subjectName: string;
-         studentScore: number;
-      }>
-   > = await httpServer.get(`${ENDPOINTS.SUBJECTS}/average-score/${mssv}`, {
-      headers: {
-         Authorization: `Bearer ${token}`,
-      },
-   });
+   const getAvgSubjects = async () => {
+      try {
+         const res: TBaseResponse<
+            Array<{
+               averageScore: number;
+               subjectId: string;
+               subjectName: string;
+               studentScore: number;
+            }>
+         > = await http_server(ctx)(
+            `${ENDPOINTS.SUBJECTS}/average-score/${mssv}`
+         );
+
+         return res.data;
+      } catch (error: any) {
+         return [];
+      }
+   };
+
+   const getStudentById = async () => {
+      try {
+         const res: TBaseResponse<TStudent> = await http_server(ctx)(
+            `${ENDPOINTS.STUDENTS}/${mssv}`
+         );
+
+         console.log(res.data);
+
+         return res.data;
+      } catch (error) {
+         console.log(error);
+         return null;
+      }
+   };
+
+   const [avgSubjects, student] = await Promise.all([
+      getAvgSubjects(),
+      getStudentById(),
+   ]);
 
    return {
       props: {
-         avgSubjects: res.data,
+         student,
+         avgSubjects,
       },
    };
 });

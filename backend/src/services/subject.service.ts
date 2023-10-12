@@ -1,16 +1,17 @@
 import { db } from '@/db/prisma';
+import { AddSubjectsStudentDto } from '@/dtos/students';
 import { CreateDto, QueryDto, UpdateDto } from '@/dtos/subjects';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
-import { Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import { StudentService } from './student.service';
-import { AddSubjectsStudentDto } from '@/dtos/students';
 
 @Service()
 export class SubjectService {
-  constructor(private readonly studentService: StudentService) {}
+  @Inject(type => StudentService)
+  private readonly studentService: StudentService;
 
   async getAllSubjects(q?: QueryDto) {
     const { page, limit, name, studentId } = q || {};

@@ -11,6 +11,10 @@ import Container from 'typedi';
 import { RolesService } from '@/services/roles.service';
 import { Routes } from '@/interfaces/routes.interface';
 import { logger, stream } from '@/utils/logger';
+import { loadAllLocales } from './i18n/i18n-util.sync';
+import { getPreferredLocale } from './utils/get-pref-locale';
+import { TRequestWithLocale } from './interfaces/common.type';
+import L from './i18n/i18n-node';
 
 export class App {
   public app: express.Application;
@@ -30,6 +34,7 @@ export class App {
   }
 
   public listen() {
+    loadAllLocales();
     this.app.listen(this.port, () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} =======`);
@@ -51,7 +56,22 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    dbLogger();
+    this.app.use((req: TRequestWithLocale, res, next) => {
+      try {
+        const locale = getPreferredLocale(req);
+        console.log({
+          locale,
+        });
+        req.translate = L[locale];
+        req.locale = locale || 'en';
+
+        next();
+      } catch (error) {
+        req.translate = L['en'];
+        req.locale = 'en';
+        next();
+      }
+    });
     subjectSoftDelete();
   }
 

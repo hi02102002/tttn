@@ -5,6 +5,8 @@ export default async function handler(
    req: NextApiRequest,
    res: NextApiResponse
 ) {
+   const locale = req.cookies['locale'] || 'en';
+
    try {
       if (req.method === 'POST') {
          deleteCookie('accessToken', {
@@ -13,18 +15,25 @@ export default async function handler(
          });
 
          res.status(200).json({
-            message: 'Logout successfully',
+            message:
+               locale === 'en' ? 'Logout successfully' : 'Đăng xuất thành công',
             data: null,
          });
       } else {
          res.status(405).json({
-            message: 'Method not allowed',
+            message:
+               locale === 'en'
+                  ? 'Method not allowed'
+                  : 'Phương thức không được phép',
             data: null,
          });
       }
    } catch (error: any) {
       res.status(error?.response.status || 500).json({
-         message: error?.response?.data?.message || 'Something went wrong',
+         message:
+            error?.response?.data?.message || locale === 'en'
+               ? 'Internal server error'
+               : 'Lỗi máy chủ nội bộ',
          data: null,
       });
    }

@@ -26,8 +26,6 @@ export class FirebaseService {
   }
 
   async uploadFile(file: Express.Multer.File) {
-    console.log(file);
-
     const token = uuid();
     const metadata = {
       metadata: {

@@ -12,9 +12,14 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use(
    function (config) {
       const accessToken = getCookie('accessToken');
+      const lang = getCookie('lang') || 'en';
 
       if (accessToken) {
          config.headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
+      if (lang) {
+         config.headers['locale'] = lang;
       }
 
       return config;

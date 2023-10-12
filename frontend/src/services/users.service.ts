@@ -1,7 +1,12 @@
 import { httpClient } from '@/lib/axios';
 import { TChangePasswordDto } from '@/types/auth';
 import { TBaseResponse, TBaseService } from '@/types/shared';
-import { TUpdateProfileDto } from '@/types/user';
+import {
+   TQueryUser,
+   TUpdateProfileDto,
+   TUpdateUserDto,
+   TUser,
+} from '@/types/user';
 
 class UsersService implements TBaseService {
    public endpoint = '/users';
@@ -33,6 +38,33 @@ class UsersService implements TBaseService {
             'Content-Type': 'multipart/form-data',
          },
       });
+   }
+
+   adminUpdatePassword(
+      userId: string,
+      data: Omit<TChangePasswordDto, 'oldPassword'>
+   ): Promise<TBaseResponse<null>> {
+      return httpClient.post(
+         `${this.endpoint}/update-password/${userId}`,
+         data
+      );
+   }
+   getAllUsers(q?: TQueryUser): Promise<
+      TBaseResponse<{
+         total: number;
+         users: TUser[];
+      }>
+   > {
+      return httpClient.get(this.endpoint, {
+         params: q,
+      });
+   }
+
+   updateUser(
+      userId: string,
+      data: TUpdateUserDto
+   ): Promise<TBaseResponse<TUser>> {
+      return httpClient.patch(`${this.endpoint}/${userId}`, data);
    }
 }
 

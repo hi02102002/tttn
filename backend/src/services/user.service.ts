@@ -1,17 +1,72 @@
-import { Service } from 'typedi';
-import { FileService } from './file.service';
-import { HttpException } from '@/exceptions';
 import { db } from '@/db/prisma';
-import { StatusCodes } from 'http-status-codes';
-import { ChangePassDto, UpdateProfileDto } from '@/dtos/users';
-import * as bcrypt from 'bcrypt';
+import { AdminUpdatePassDto, ChangePassDto, QueryDto, UpdateProfileDto, UpdateUserDto } from '@/dtos/users';
+import { HttpException } from '@/exceptions';
 import { TUser } from '@/interfaces/common.type';
-import { RoleName } from '@prisma/client';
+import { Prisma, RoleName } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
 import { omit } from 'lodash';
+import { Service } from 'typedi';
+import { pagination } from './../utils/pagination';
+import { FileService } from './file.service';
 
 @Service()
 export class UserService {
   constructor(private readonly fileService: FileService) {}
+
+  async getAllUsers(currentUser: string, query?: QueryDto) {
+    const { fullName, username, orderBy, page, limit } = query || {};
+
+    const where: Prisma.UserWhereInput = {
+      OR: [
+        {
+          fullName: {
+            contains: fullName,
+          },
+        },
+        {
+          username: {
+            contains: username,
+          },
+        },
+      ],
+      id: {
+        not: currentUser,
+      },
+    };
+
+    const [users, total] = await db.$transaction([
+      db.user.findMany({
+        where,
+        orderBy: orderBy
+          ? {
+              fullName: orderBy.fullname,
+              username: orderBy.username,
+            }
+          : undefined,
+        ...pagination(page, limit),
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          status: true,
+          usersRoles: {
+            select: {
+              role: true,
+            },
+          },
+        },
+      }),
+      db.user.count({
+        where,
+      }),
+    ]);
+
+    return {
+      users,
+      total,
+    };
+  }
 
   async uploadAvatar(userId: string, file: Express.Multer.File) {
     const user = await this.getUserById(userId);
@@ -69,7 +124,7 @@ export class UserService {
 
     const student = await db.student.findUnique({
       where: {
-        userId: _user.id,
+        mssv: _user.studentId,
       },
     });
 
@@ -79,7 +134,7 @@ export class UserService {
 
     const updatedStudent = await db.user.update({
       where: {
-        id: _user.id,
+        id: _user.studentId,
       },
       data: {
         student: {
@@ -94,5 +149,76 @@ export class UserService {
     });
 
     return omit(updatedStudent, ['password']);
+  }
+
+  async adminUpdatePassword(userId: string, body: AdminUpdatePassDto) {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new HttpException(StatusCodes.NOT_FOUND, `User with this id not found`);
+    }
+
+    const newPassword = await bcrypt.hash(body.newPassword, 10);
+
+    await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: newPassword,
+      },
+    });
+  }
+
+  async updateUser(userId: string, data: UpdateUserDto) {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new HttpException(StatusCodes.NOT_FOUND, `User with this id not found`);
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        id: userId,
+      },
+      data,
+      select: {
+        id: true,
+        fullName: true,
+        username: true,
+        status: true,
+        usersRoles: {
+          select: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    return updatedUser;
+  }
+
+  async deleteUser(userId: string) {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new HttpException(StatusCodes.NOT_FOUND, `User with this id not found`);
+    }
+
+    const student = await db.student.findUnique({
+      where: {
+        mssv: user.studentId,
+      },
+    });
+
+    if (student) {
+      throw new HttpException(StatusCodes.BAD_REQUEST, `This user is a student`);
+    }
+
+    await db.user.delete({
+      where: {
+        id: userId,
+      },
+    });
   }
 }

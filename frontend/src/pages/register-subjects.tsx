@@ -2,10 +2,7 @@ import {
    Button,
    Checkbox,
    Form,
-   FormControl,
    FormField,
-   FormItem,
-   FormLabel,
    LoadingFullpage,
    Table,
    TableBody,
@@ -17,14 +14,14 @@ import {
 import { ENDPOINTS } from '@/constants';
 import { useListSubjectToRegister, useRegisterSubjects } from '@/hooks/api';
 import Layout from '@/layouts/student';
-import { httpServer } from '@/lib/axios';
+import http_server from '@/lib/axios/http-server';
+
 import { RoleName } from '@/types/role';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
 import { TSubject } from '@/types/subject';
 import { withUser } from '@/utils/withUser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GetServerSideProps } from 'next';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -161,14 +158,9 @@ const RegisterSubjects: NextPageWithLayout<Props> = ({
 export const getServerSideProps: GetServerSideProps = withUser({
    isProtected: true,
    roles: [RoleName.STUDENT],
-})(async ({ user, token }) => {
-   const res: TBaseResponse<Array<TSubject>> = await httpServer.get(
-      `${ENDPOINTS.SUBJECTS}/list-register`,
-      {
-         headers: {
-            Authorization: `Bearer ${token}`,
-         },
-      }
+})(async ({ ctx }) => {
+   const res: TBaseResponse<Array<TSubject>> = await http_server(ctx)(
+      `${ENDPOINTS.SUBJECTS}/list-register`
    );
 
    return {

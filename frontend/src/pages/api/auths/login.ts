@@ -1,12 +1,13 @@
+import { API_URL } from '@/constants';
 import { TBaseResponse } from '@/types/shared';
 import axios from 'axios';
-import { NextApiRequest, NextApiResponse } from 'next';
 import { setCookie } from 'cookies-next';
-import { API_URL } from '@/constants';
+import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handler(
    req: NextApiRequest,
    res: NextApiResponse
 ) {
+   const locale = req.cookies['locale'] || 'en';
    try {
       if (req.method === 'POST') {
          const { username, password } = req.body;
@@ -16,10 +17,18 @@ export default async function handler(
                accessToken: string;
                refreshToken: string;
             }>
-         >(`${API_URL}/auths/login`, {
-            username,
-            password,
-         });
+         >(
+            `${API_URL}/auths/login`,
+            {
+               username,
+               password,
+            },
+            {
+               headers: {
+                  locale,
+               },
+            }
+         );
 
          const data = _res.data;
 

@@ -12,7 +12,7 @@ import NextNProgress from 'nextjs-progressbar';
 import { useState } from 'react';
 import { Toaster } from 'sonner';
 
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+const App = ({ Component, pageProps }: AppPropsWithLayout) => {
    const [queryClient] = useState(() => new QueryClient());
    const getLayout = Component.getLayout ?? ((page) => page);
 
@@ -42,4 +42,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
          </QueryClientProvider>
       </>
    );
-}
+};
+
+export default App;

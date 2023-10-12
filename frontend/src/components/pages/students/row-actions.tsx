@@ -11,6 +11,7 @@ import { ROUTES } from '@/constants';
 import {
    useAddSubjectsStudent,
    useDeleteStudents,
+   useExportSubjectsStudent,
    useUpdateStudent,
 } from '@/hooks/api';
 import { TQueryStudent, TStudent } from '@/types/student';
@@ -35,8 +36,16 @@ export const RowActions = ({ row, q }: Props) => {
       isLoading: isAddingSubjectsStudent,
    } = useAddSubjectsStudent();
 
+   const {
+      mutateAsync: exportSubjectsStudent,
+      isLoading: isExportingSubjectsStudent,
+   } = useExportSubjectsStudent();
+
    const isLoadingActions =
-      isDeletingStudents || isUpdatingStudent || isAddingSubjectsStudent;
+      isDeletingStudents ||
+      isUpdatingStudent ||
+      isAddingSubjectsStudent ||
+      isExportingSubjectsStudent;
 
    return (
       <>
@@ -51,6 +60,13 @@ export const RowActions = ({ row, q }: Props) => {
                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[160px]">
+               <DropdownMenuItem
+                  onClick={() => {
+                     exportSubjectsStudent(row.original.mssv);
+                  }}
+               >
+                  Export list scores
+               </DropdownMenuItem>
                <DropdownMenuItem
                   onClick={() => {
                      router.push(`${ROUTES.SCORES}?mssv=${row.original.mssv}`);

@@ -1,29 +1,26 @@
+import { JWT_ACCESS_SECRET_KEY, JWT_REFRESH_SECRET_KEY } from '@/configs';
 import { db } from '@/db/prisma';
 import { LoginDto, RegisterDto } from '@/dtos/auth';
 import { HttpException } from '@/exceptions';
-import { catchAsync } from '@/utils/catch-async';
-import { StatusCodes } from 'http-status-codes';
-import { Service } from 'typedi';
-import * as bcrypt from 'bcrypt';
-import { omit } from 'lodash';
-import { RoleName, User } from '@prisma/client';
-import * as jwt from 'jsonwebtoken';
 import { TUser } from '@/interfaces/common.type';
-import { JWT_ACCESS_SECRET_KEY, JWT_REFRESH_SECRET_KEY } from '@/configs';
+import { RoleName, UserStatus } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
+import * as jwt from 'jsonwebtoken';
+import { omit } from 'lodash';
+import { Service } from 'typedi';
 
 @Service()
 export class AuthService {
   public register = async (data: RegisterDto) => {
     try {
-      const { username, password } = data;
+      const { username, password, studentId, fullName } = data;
 
       const role = await db.role.findUnique({
         where: {
           name: 'STUDENT',
         },
       });
-
-      console.log(role);
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -46,6 +43,8 @@ export class AuthService {
               name: `username-${username}`,
             },
           },
+          fullName,
+          studentId,
         },
         select: {
           username: true,
@@ -61,7 +60,6 @@ export class AuthService {
 
       return user;
     } catch (error: any) {
-      console.log(error);
       if (error?.code === 'P2002') {
         throw new HttpException(StatusCodes.BAD_REQUEST, 'Username already exists');
       }
@@ -81,18 +79,24 @@ export class AuthService {
         username: true,
         id: true,
         password: true,
+        fullName: true,
         usersRoles: {
           include: {
             role: true,
           },
         },
-        student: true,
         avatar: true,
+        status: true,
+        studentId: true,
       },
     });
 
     if (!user) {
       throw new HttpException(StatusCodes.NOT_FOUND, 'Account with this username does not exists');
+    }
+
+    if (user.status === UserStatus.BLOCKED) {
+      throw new HttpException(StatusCodes.FORBIDDEN, 'Your account has been blocked. Please contact admin for more information');
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
@@ -149,11 +153,6 @@ export class AuthService {
           },
         },
         avatar: true,
-        student: {
-          include: {
-            class: true,
-          },
-        },
       },
     });
 
@@ -162,5 +161,53 @@ export class AuthService {
     }
 
     return omit(user, ['password']);
+  }
+
+  async registerForAdmin(data: RegisterDto) {
+    const { username, password, fullName, studentId } = data;
+
+    const role = await db.role.findUnique({
+      where: {
+        name: 'ADMIN',
+      },
+    });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await db.user.create({
+      data: {
+        username,
+        password: hashedPassword,
+        fullName,
+        studentId,
+        usersRoles: {
+          createMany: {
+            data: [
+              {
+                roleId: role.id,
+              },
+            ],
+          },
+        },
+        avatar: {
+          create: {
+            url: `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
+            name: `username-${username}`,
+          },
+        },
+      },
+      select: {
+        username: true,
+        id: true,
+        usersRoles: {
+          include: {
+            role: true,
+          },
+        },
+        avatar: true,
+      },
+    });
+
+    return user;
   }
 }

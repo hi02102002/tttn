@@ -1,4 +1,4 @@
-import { TRequestWithUser } from '@/interfaces/common.type';
+import { TRequestWithLocale, TRequestWithUser } from '@/interfaces/common.type';
 import { AuthService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
 import { StatusCodes } from 'http-status-codes';
@@ -8,7 +8,7 @@ import { Container } from 'typedi';
 export class AuthController {
   private readonly authService = Container.get(AuthService);
 
-  public login = catchAsync(async (req, res) => {
+  public login = catchAsync(async (req: TRequestWithLocale, res) => {
     const data = await this.authService.login(req.body);
 
     res.status(StatusCodes.OK).json({
@@ -31,6 +31,15 @@ export class AuthController {
 
     res.status(StatusCodes.OK).json({
       message: 'Get me successfully',
+      data,
+    });
+  });
+
+  public registerAdmin = catchAsync(async (req, res) => {
+    const data = await this.authService.registerForAdmin(req.body);
+
+    res.status(StatusCodes.CREATED).json({
+      message: 'Register admin successfully',
       data,
     });
   });

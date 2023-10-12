@@ -26,7 +26,7 @@ export class StudentRoute implements Routes {
       roles([RoleName.ADMIN]),
       this.controller.getAllStudents,
     );
-    this.router.get(`${this.path}/:mssv`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.getStudentByMssv);
+    this.router.get(`${this.path}/:mssv`, AuthMiddleware, this.controller.getStudentByMssv);
     this.router.post(
       `${this.path}`,
       validate({
@@ -56,5 +56,6 @@ export class StudentRoute implements Routes {
       this.controller.deleteManyStudents,
     );
     this.router.post(`${this.path}/add-subjects`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.addSubjects);
+    this.router.get(`${this.path}/export/:mssv`, AuthMiddleware, this.controller.exportSubjectStudent);
   }
 }

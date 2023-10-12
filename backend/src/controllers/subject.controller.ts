@@ -1,4 +1,4 @@
-import { TRequestWithUser } from '@/interfaces/common.type';
+import { TRequestWithLocale, TRequestWithUser } from '@/interfaces/common.type';
 import { SubjectService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
 import { StatusCodes } from 'http-status-codes';
@@ -47,7 +47,8 @@ export class SubjectController {
     });
   });
 
-  public getAverageScore = catchAsync(async (req, res) => {
+  public getAverageScore = catchAsync(async (req: TRequestWithLocale, res) => {
+    console.log(req.locale);
     const mssv = req.params.mssv as string;
 
     const data = await this.subjectService.getAverageScoreByMssv(mssv);

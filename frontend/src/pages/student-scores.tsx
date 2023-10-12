@@ -4,7 +4,6 @@ import { useUser } from '@/contexts/user.ctx';
 import { useScores } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/student';
-import { httpServer } from '@/lib/axios';
 import { RoleName } from '@/types/role';
 import { TQueryScore, TScore } from '@/types/score';
 import { NextPageWithLayout, TBaseResponse } from '@/types/shared';

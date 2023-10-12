@@ -18,6 +18,7 @@ import {
    FormMessage,
    Input,
 } from '@/components/ui';
+import { ENDPOINTS } from '@/constants';
 import { useUser } from '@/contexts/user.ctx';
 import {
    useChangePassword,
@@ -25,8 +26,10 @@ import {
    useUploadAvatar,
 } from '@/hooks/api';
 import Layout from '@/layouts/student';
+import http_server from '@/lib/axios/http-server';
 import { RoleName } from '@/types/role';
-import { NextPageWithLayout } from '@/types/shared';
+import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
+import { TStudent } from '@/types/student';
 import { withUser } from '@/utils/withUser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
@@ -77,13 +80,17 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
-const UpdateProfile: NextPageWithLayout = () => {
+type Props = {
+   student: TStudent | null;
+};
+
+const UpdateProfile: NextPageWithLayout<Props> = ({ student }) => {
    const { user } = useUser();
 
    const addressForm = useForm<AddressFormValues>({
       resolver: zodResolver(addressSchema),
       defaultValues: {
-         address: user?.student?.address || '',
+         address: student?.address || '',
       },
    });
 
@@ -140,7 +147,7 @@ const UpdateProfile: NextPageWithLayout = () => {
                      <Input
                         placeholder="MSSV"
                         className="max-w-sm"
-                        defaultValue={user?.student?.mssv}
+                        defaultValue={student?.mssv}
                         disabled
                      />
                   </div>
@@ -160,7 +167,7 @@ const UpdateProfile: NextPageWithLayout = () => {
                      <Input
                         placeholder="Name"
                         className="max-w-sm"
-                        defaultValue={user?.student?.name}
+                        defaultValue={student?.name}
                         disabled
                      />
                   </div>
@@ -401,6 +408,27 @@ UpdateProfile.getLayout = (page) => {
 export const getServerSideProps: GetServerSideProps = withUser({
    isProtected: true,
    roles: [RoleName.STUDENT],
-})();
+})(async ({ ctx, user }) => {
+   const mssv = user?.student?.mssv || user?.username;
+   const getStudentById = async () => {
+      try {
+         const res: TBaseResponse<TStudent> = await http_server(ctx)(
+            `${ENDPOINTS.STUDENTS}/${mssv}`
+         );
+
+         return res.data;
+      } catch (error) {
+         return null;
+      }
+   };
+
+   const student = await getStudentById();
+
+   return {
+      props: {
+         student,
+      },
+   };
+});
 
 export default UpdateProfile;

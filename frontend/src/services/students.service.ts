@@ -51,6 +51,12 @@ class StudentsService implements TBaseService {
    ): Promise<TBaseResponse<null>> {
       return httpClient.post(`${this.endpoint}/add-subjects`, data);
    }
+
+   exportSubjectStudent(mssv: string): Promise<Blob> {
+      return httpClient.get(`${this.endpoint}/export/${mssv}`, {
+         responseType: 'blob',
+      });
+   }
 }
 
 export const studentsService = new StudentsService();

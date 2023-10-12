@@ -8,7 +8,6 @@ export const roles = (roles: RoleName[]) => (req: TRequestWithUser, res: Respons
     const user = req.user as TUser;
 
     const isHasRole = user.usersRoles.some(ur => {
-      console.log(roles, ur.role.name);
       return roles.includes(ur.role.name as RoleName);
     });
 

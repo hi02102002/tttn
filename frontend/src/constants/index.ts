@@ -10,6 +10,7 @@ export const ROUTES = {
    SUBJECTS: '/subjects',
    SCORES: '/scores',
    ROLES: '/roles',
+   USERS: '/users',
    403: '/403',
    STUDENT_DASHBOARD: '/student-dashboard',
    STUDENT_REGISTER_SUBJECTS: '/register-subjects',

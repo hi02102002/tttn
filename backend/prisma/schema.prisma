@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["debian-openssl-3.0.x"]
 }
 
 generator dbml {
@@ -18,9 +19,17 @@ model User {
   id         String     @id @default(uuid()) @map("user_id")
   username   String     @unique
   password   String
-  student    Student?
   usersRoles UserRole[] // 1 user có nhiều role
   avatar     File?
+  fullName   String?    @map("full_name")
+  status     UserStatus @default(ACTIVE)
+  student    Student?   @relation(fields: [studentId], references: [mssv], onDelete: Cascade)
+  studentId  String?    @unique
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
 }
 
 enum RoleName {
@@ -87,8 +96,7 @@ model Student {
   classId String  @map("class_id")
   class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade) // 1 sinh viên chỉ thuộc 1 lớp
   scores  Score[]
-  user    User    @relation(fields: [userId], references: [id])
-  userId  String  @unique // relation scalar field (used in the `@relation` attribute above)
+  user    User?
 
   @@map("students")
 }
