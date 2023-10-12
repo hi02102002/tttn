@@ -3,7 +3,7 @@ import { DataTable, DataTableColumnHeader } from '@/components/ui';
 import { useScores } from '@/hooks/api';
 import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
-import { httpServer } from '@/lib/axios';
+import http_server from '@/lib/axios/http-server';
 import { TClassroom } from '@/types/class';
 import { RoleName } from '@/types/role';
 import { TQueryScore, TScore } from '@/types/score';
@@ -173,7 +173,7 @@ export const getServerSideProps: GetServerSideProps = withUser({
       }
 
       try {
-         const res: TBaseResponse<TStudent> = await httpServer.get(
+         const res: TBaseResponse<TStudent> = await http_server(ctx)(
             `/students/${mssv}`
          );
          return res.data;
@@ -188,7 +188,7 @@ export const getServerSideProps: GetServerSideProps = withUser({
       }
 
       try {
-         const res: TBaseResponse<TClassroom> = await httpServer.get(
+         const res: TBaseResponse<TClassroom> = await http_server(ctx)(
             `/classes/${classId}`
          );
          return res.data;

@@ -1,5 +1,8 @@
-import { CREDENTIALS, LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from '@/configs';
-import { ErrorMiddleware, dbLogger, subjectSoftDelete } from '@/middlewares';
+import { LOG_FORMAT, NODE_ENV, PORT } from '@/configs';
+import { Routes } from '@/interfaces/routes.interface';
+import { ErrorMiddleware, subjectSoftDelete } from '@/middlewares';
+import { RolesService } from '@/services/roles.service';
+import { logger, stream } from '@/utils/logger';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -8,13 +11,9 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import morgan from 'morgan';
 import Container from 'typedi';
-import { RolesService } from '@/services/roles.service';
-import { Routes } from '@/interfaces/routes.interface';
-import { logger, stream } from '@/utils/logger';
-import { loadAllLocales } from './i18n/i18n-util.sync';
-import { getPreferredLocale } from './utils/get-pref-locale';
-import { TRequestWithLocale } from './interfaces/common.type';
 import L from './i18n/i18n-node';
+import { TRequestWithLocale } from './interfaces/common.type';
+import { getPreferredLocale } from './utils/get-pref-locale';
 
 export class App {
   public app: express.Application;
@@ -34,7 +33,6 @@ export class App {
   }
 
   public listen() {
-    loadAllLocales();
     this.app.listen(this.port, () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} =======`);

@@ -48,6 +48,8 @@ const RegisterSubjects: NextPageWithLayout<Props> = ({
       },
    });
 
+   const subjectsField = form.watch('subjects');
+
    const { mutateAsync: registerSubjects, isLoading: isRegisteringSubjects } =
       useRegisterSubjects();
 
@@ -141,8 +143,9 @@ const RegisterSubjects: NextPageWithLayout<Props> = ({
                      <div className="flex items-center justify-end">
                         <Button
                            type="submit"
-                           disabled={!form.formState.isValid}
+                           disabled={subjectsField.length === 0}
                            className="select-none"
+                           loading={isRegisteringSubjects}
                         >
                            Register subjects
                         </Button>
