@@ -261,12 +261,13 @@ export class StudentService {
 
     const sheet = workbook.addWorksheet('List subjects');
 
+    sheet.getColumn('B').width = 30;
     sheet.mergeCells('A2:E2');
     sheet.mergeCells('A3:E3');
-    sheet.mergeCells('G2:M2');
-    sheet.mergeCells('G3:M3');
-    sheet.mergeCells('G4:M4');
-    sheet.mergeCells('A6:M6');
+    sheet.mergeCells('I2:O2');
+    sheet.mergeCells('I3:O3');
+    sheet.mergeCells('I4:O4');
+    sheet.mergeCells('A6:O6');
     sheet.mergeCells('B8:D8');
     sheet.mergeCells('E8:G8');
     sheet.mergeCells('H8:I8');
@@ -276,9 +277,9 @@ export class StudentService {
 
     const A2 = sheet.getCell('A2');
     const A3 = sheet.getCell('A3');
-    const G2 = sheet.getCell('G2');
-    const G3 = sheet.getCell('G3');
-    const G4 = sheet.getCell('G4');
+    const I2 = sheet.getCell('I2');
+    const I3 = sheet.getCell('I3');
+    const I4 = sheet.getCell('I4');
     const A6 = sheet.getCell('A6');
     const A8 = sheet.getCell('A8');
     const B8 = sheet.getCell('B8');
@@ -294,15 +295,15 @@ export class StudentService {
     A3.alignment = { horizontal: 'center' };
     A2.font = { bold: true };
     A3.font = { bold: true };
-    G2.value = 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM';
-    G3.value = 'Độc lập - Tự do - Hạnh phúc';
-    G2.alignment = { horizontal: 'center' };
-    G3.alignment = { horizontal: 'center' };
-    G2.font = { bold: true };
-    G3.font = { bold: true };
-    G4.value = `Hồ Chí Minh, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`;
-    G4.alignment = { horizontal: 'center' };
-    G4.font = {
+    I2.value = 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM';
+    I3.value = 'Độc lập - Tự do - Hạnh phúc';
+    I2.alignment = { horizontal: 'center' };
+    I3.alignment = { horizontal: 'center' };
+    I2.font = { bold: true };
+    I3.font = { bold: true };
+    I4.value = `Hồ Chí Minh, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`;
+    I4.alignment = { horizontal: 'center' };
+    I4.font = {
       italic: true,
     };
 
