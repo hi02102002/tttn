@@ -13,7 +13,7 @@ import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { useMemo, useState } from 'react';
 
 type Props = {
@@ -118,41 +118,49 @@ const Scores: NextPageWithLayout<Props> = ({ student, classroom }) => {
    );
 
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold">Manage scores</h2>
-            <p className="text-muted-foreground">
-               {student
-                  ? `All scores of student with MSSV ${student.mssv}`
-                  : 'List all scores'}
-            </p>
+      <>
+         <Head>
+            <title>Manage scores</title>
+         </Head>
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Manage scores</h2>
+               <p className="text-muted-foreground">
+                  {student
+                     ? `All scores of student with MSSV ${student.mssv}`
+                     : 'List all scores'}
+               </p>
+            </div>
+            <DataTable
+               columns={columns}
+               data={data?.scores || []}
+               options={{
+                  manualPagination: true,
+                  manualSorting: true,
+                  enableMultiSort: true,
+                  state: {
+                     pagination,
+                     sorting,
+                  },
+                  onPaginationChange: setPagination,
+                  onSortingChange: setSorting,
+                  pageCount: calcPageCount(
+                     data?.total || 0,
+                     pagination.pageSize
+                  ),
+                  isLoading,
+               }}
+               DataToolbar={(table) => (
+                  <TableToolbar
+                     table={table}
+                     q={q}
+                     renderFilterName={renderSearch}
+                     classroom={classroom as TClassroom}
+                  />
+               )}
+            />
          </div>
-         <DataTable
-            columns={columns}
-            data={data?.scores || []}
-            options={{
-               manualPagination: true,
-               manualSorting: true,
-               enableMultiSort: true,
-               state: {
-                  pagination,
-                  sorting,
-               },
-               onPaginationChange: setPagination,
-               onSortingChange: setSorting,
-               pageCount: calcPageCount(data?.total || 0, pagination.pageSize),
-               isLoading,
-            }}
-            DataToolbar={(table) => (
-               <TableToolbar
-                  table={table}
-                  q={q}
-                  renderFilterName={renderSearch}
-                  classroom={classroom as TClassroom}
-               />
-            )}
-         />
-      </div>
+      </>
    );
 };
 

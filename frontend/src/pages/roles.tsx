@@ -1,4 +1,4 @@
-import { RowActions, TableToolbar } from '@/components/pages/roles';
+import { TableToolbar } from '@/components/pages/roles';
 import { DataTable, DataTableColumnHeader } from '@/components/ui';
 import { useRoles } from '@/hooks/api';
 import { useSorting } from '@/hooks/shared';
@@ -9,7 +9,8 @@ import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
-import React, { useMemo, useState } from 'react';
+import Head from 'next/head';
+import { useMemo, useState } from 'react';
 
 const Roles: NextPageWithLayout = () => {
    const [pagination, setPagination] = useState<PaginationState>({
@@ -55,30 +56,38 @@ const Roles: NextPageWithLayout = () => {
    );
 
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold">Manage roles</h2>
-            <p className="text-muted-foreground">Manage list of roles</p>
+      <>
+         <Head>
+            <title>Manage roles</title>
+         </Head>
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Manage roles</h2>
+               <p className="text-muted-foreground">Manage list of roles</p>
+            </div>
+            <DataTable
+               columns={columns}
+               data={data?.roles || []}
+               options={{
+                  manualPagination: true,
+                  manualSorting: true,
+                  enableMultiSort: true,
+                  state: {
+                     pagination,
+                     sorting,
+                  },
+                  onPaginationChange: setPagination,
+                  onSortingChange: setSorting,
+                  pageCount: calcPageCount(
+                     data?.total || 0,
+                     pagination.pageSize
+                  ),
+                  isLoading,
+               }}
+               DataToolbar={(table) => <TableToolbar table={table} q={q} />}
+            />
          </div>
-         <DataTable
-            columns={columns}
-            data={data?.roles || []}
-            options={{
-               manualPagination: true,
-               manualSorting: true,
-               enableMultiSort: true,
-               state: {
-                  pagination,
-                  sorting,
-               },
-               onPaginationChange: setPagination,
-               onSortingChange: setSorting,
-               pageCount: calcPageCount(data?.total || 0, pagination.pageSize),
-               isLoading,
-            }}
-            DataToolbar={(table) => <TableToolbar table={table} q={q} />}
-         />
-      </div>
+      </>
    );
 };
 

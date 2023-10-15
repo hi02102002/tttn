@@ -10,6 +10,7 @@ import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useMemo, useState } from 'react';
 
 const Subjects: NextPageWithLayout = () => {
@@ -84,36 +85,44 @@ const Subjects: NextPageWithLayout = () => {
    );
 
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold">Manage subjects</h2>
-            <p className="text-muted-foreground">List of all subjects</p>
+      <>
+         <Head>
+            <title>Manage subjects</title>
+         </Head>
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Manage subjects</h2>
+               <p className="text-muted-foreground">List of all subjects</p>
+            </div>
+            <DataTable
+               columns={columns}
+               data={data?.subjects || []}
+               options={{
+                  manualPagination: true,
+                  manualSorting: true,
+                  enableMultiSort: true,
+                  state: {
+                     pagination,
+                     sorting,
+                  },
+                  onPaginationChange: setPagination,
+                  onSortingChange: setSorting,
+                  pageCount: calcPageCount(
+                     data?.total || 0,
+                     pagination.pageSize
+                  ),
+                  isLoading,
+               }}
+               DataToolbar={(table) => (
+                  <TableToolbar
+                     table={table}
+                     renderFilterName={renderFilterName}
+                     q={q}
+                  />
+               )}
+            />
          </div>
-         <DataTable
-            columns={columns}
-            data={data?.subjects || []}
-            options={{
-               manualPagination: true,
-               manualSorting: true,
-               enableMultiSort: true,
-               state: {
-                  pagination,
-                  sorting,
-               },
-               onPaginationChange: setPagination,
-               onSortingChange: setSorting,
-               pageCount: calcPageCount(data?.total || 0, pagination.pageSize),
-               isLoading,
-            }}
-            DataToolbar={(table) => (
-               <TableToolbar
-                  table={table}
-                  renderFilterName={renderFilterName}
-                  q={q}
-               />
-            )}
-         />
-      </div>
+      </>
    );
 };
 

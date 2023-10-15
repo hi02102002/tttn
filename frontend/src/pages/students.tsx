@@ -17,6 +17,7 @@ import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useMemo, useState } from 'react';
 
 type Props = {
@@ -132,6 +133,9 @@ const Students: NextPageWithLayout<Props> = ({ classroom }) => {
 
    return (
       <>
+         <Head>
+            <title>Manage students</title>
+         </Head>
          <div className="space-y-4">
             <div>
                <h2 className="text-2xl font-semibold">

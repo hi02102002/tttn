@@ -10,6 +10,7 @@ import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useMemo, useState } from 'react';
 
 const Users: NextPageWithLayout = () => {
@@ -104,11 +105,14 @@ const Users: NextPageWithLayout = () => {
             },
          },
       ],
-      []
+      [q]
    );
 
    return (
       <>
+         <Head>
+            <title>Manage users</title>
+         </Head>
          <div className="space-y-4">
             <div>
                <h2 className="text-2xl font-semibold">Manage users</h2>

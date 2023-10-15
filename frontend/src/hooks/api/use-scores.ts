@@ -10,5 +10,6 @@ export const useScores = (q?: TQueryScore) => {
 
          return res.data;
       },
+      keepPreviousData: true,
    });
 };

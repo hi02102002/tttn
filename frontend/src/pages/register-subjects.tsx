@@ -22,6 +22,7 @@ import { TSubject } from '@/types/subject';
 import { withUser } from '@/utils/withUser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -59,6 +60,9 @@ const RegisterSubjects: NextPageWithLayout<Props> = ({
 
    return (
       <>
+         <Head>
+            <title>Register Subjects</title>
+         </Head>
          {isRegisteringSubjects && <LoadingFullpage />}
          <div className="space-y-4">
             <div>

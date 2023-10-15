@@ -34,6 +34,7 @@ import { withUser } from '@/utils/withUser';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -127,277 +128,292 @@ const UpdateProfile: NextPageWithLayout<Props> = ({ student }) => {
    };
 
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold ">Update Profile</h2>
-            <p className="text-muted-foreground">
-               Your information will be displayed here. You can edit your
-               profile here.
-            </p>
-         </div>
+      <>
+         <Head>
+            <title>Update Profile</title>
+         </Head>
          <div className="space-y-4">
-            <SectionInfo>
-               <SectionBody>
-                  <div className="space-y-4">
-                     <div>
-                        <SectionInfoTitle title="MSSV" />
-                        <p>This is your MSSV. You can&apos;t change it.</p>
-                     </div>
+            <div>
+               <h2 className="text-2xl font-semibold ">Update Profile</h2>
+               <p className="text-muted-foreground">
+                  Your information will be displayed here. You can edit your
+                  profile here.
+               </p>
+            </div>
+            <div className="space-y-4">
+               <SectionInfo>
+                  <SectionBody>
+                     <div className="space-y-4">
+                        <div>
+                           <SectionInfoTitle title="MSSV" />
+                           <p>This is your MSSV. You can&apos;t change it.</p>
+                        </div>
 
-                     <Input
-                        placeholder="MSSV"
-                        className="max-w-sm"
-                        defaultValue={student?.mssv}
-                        disabled
-                     />
-                  </div>
-               </SectionBody>
-               <SectionInfoFooter>
-                  <SectionInfoDescription description="This is your MSSV. You can use it to login to the system." />
-               </SectionInfoFooter>
-            </SectionInfo>
-            <SectionInfo>
-               <SectionBody>
-                  <div className="space-y-4">
-                     <div>
-                        <SectionInfoTitle title="Name" />
-                        <p>This is your name. You can&apos;t change it.</p>
+                        <Input
+                           placeholder="MSSV"
+                           className="max-w-sm"
+                           defaultValue={student?.mssv}
+                           disabled
+                        />
                      </div>
+                  </SectionBody>
+                  <SectionInfoFooter>
+                     <SectionInfoDescription description="This is your MSSV. You can use it to login to the system." />
+                  </SectionInfoFooter>
+               </SectionInfo>
+               <SectionInfo>
+                  <SectionBody>
+                     <div className="space-y-4">
+                        <div>
+                           <SectionInfoTitle title="Name" />
+                           <p>This is your name. You can&apos;t change it.</p>
+                        </div>
 
-                     <Input
-                        placeholder="Name"
-                        className="max-w-sm"
-                        defaultValue={student?.name}
-                        disabled
-                     />
-                  </div>
-               </SectionBody>
-               <SectionInfoFooter>
-                  <SectionInfoDescription
-                     description="
+                        <Input
+                           placeholder="Name"
+                           className="max-w-sm"
+                           defaultValue={student?.name}
+                           disabled
+                        />
+                     </div>
+                  </SectionBody>
+                  <SectionInfoFooter>
+                     <SectionInfoDescription
+                        description="
                         This is your username. Once you have created your account, you can't change it."
-                  />
-               </SectionInfoFooter>
-            </SectionInfo>
-            <SectionInfo>
-               <SectionBody>
-                  <div className="flex items-start justify-between gap-4">
-                     <div>
-                        <SectionInfoTitle title="Avatar" />
-                        <p>
-                           This is your avatar.
-                           <br />
-                           Click on the avatar to upload a custom one from your
-                           files.
-                        </p>
-                     </div>
-                     <Avatar className="h-24 w-24 cursor-pointer relative">
-                        <input
-                           type="file"
-                           className="hidden"
-                           accept="image/*"
-                           ref={avatarRef}
-                           onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              setAvatar(URL.createObjectURL(file));
-                              uploadAvatar(file, {
-                                 onSuccess: () => {
-                                    if (avatarRef.current) {
-                                       avatarRef.current.value = '';
-                                    }
-                                 },
-                                 onError: () => {
-                                    if (avatarRef.current) {
-                                       avatarRef.current.value = '';
-                                    }
-                                    setAvatar(null);
-                                 },
-                              });
-                           }}
-                        />
-                        <AvatarImage
-                           src={avatar || user?.avatar.url}
-                           alt={user?.username}
-                           draggable={false}
-                           onClick={() => avatarRef.current?.click()}
-                        />
-                        <AvatarFallback>
-                           {user?.username?.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                        {isUploadAvatarLoading && (
-                           <div>
-                              <div className="absolute inset-0 bg-background/0 backdrop-blur-sm"></div>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                 <IconLoader2
-                                    className="animate-spin"
-                                    size={24}
-                                 />
+                     />
+                  </SectionInfoFooter>
+               </SectionInfo>
+               <SectionInfo>
+                  <SectionBody>
+                     <div className="flex items-start justify-between gap-4">
+                        <div>
+                           <SectionInfoTitle title="Avatar" />
+                           <p>
+                              This is your avatar.
+                              <br />
+                              Click on the avatar to upload a custom one from
+                              your files.
+                           </p>
+                        </div>
+                        <Avatar className="h-24 w-24 cursor-pointer relative">
+                           <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              ref={avatarRef}
+                              onChange={(e) => {
+                                 const file = e.target.files?.[0];
+                                 if (!file) return;
+                                 setAvatar(URL.createObjectURL(file));
+                                 uploadAvatar(file, {
+                                    onSuccess: () => {
+                                       if (avatarRef.current) {
+                                          avatarRef.current.value = '';
+                                       }
+                                    },
+                                    onError: () => {
+                                       if (avatarRef.current) {
+                                          avatarRef.current.value = '';
+                                       }
+                                       setAvatar(null);
+                                    },
+                                 });
+                              }}
+                           />
+                           <AvatarImage
+                              src={avatar || user?.avatar.url}
+                              alt={user?.username}
+                              draggable={false}
+                              onClick={() => avatarRef.current?.click()}
+                           />
+                           <AvatarFallback>
+                              {user?.username?.charAt(0).toUpperCase()}
+                           </AvatarFallback>
+                           {isUploadAvatarLoading && (
+                              <div>
+                                 <div className="absolute inset-0 bg-background/0 backdrop-blur-sm"></div>
+                                 <div className="absolute inset-0 flex items-center justify-center">
+                                    <IconLoader2
+                                       className="animate-spin"
+                                       size={24}
+                                    />
+                                 </div>
                               </div>
-                           </div>
-                        )}
-                     </Avatar>
-                  </div>
-               </SectionBody>
-               <SectionInfoFooter>
-                  <SectionInfoDescription description="An avatar is optional but strongly recommended." />
-               </SectionInfoFooter>
-            </SectionInfo>
+                           )}
+                        </Avatar>
+                     </div>
+                  </SectionBody>
+                  <SectionInfoFooter>
+                     <SectionInfoDescription description="An avatar is optional but strongly recommended." />
+                  </SectionInfoFooter>
+               </SectionInfo>
 
-            <SectionInfo>
-               <SectionBody>
-                  <div className="space-y-4">
-                     <div>
-                        <SectionInfoTitle title="Address" />
-                        <p>Please enter the your address.</p>
+               <SectionInfo>
+                  <SectionBody>
+                     <div className="space-y-4">
+                        <div>
+                           <SectionInfoTitle title="Address" />
+                           <p>Please enter the your address.</p>
+                        </div>
+                        <Form {...addressForm}>
+                           <form
+                              id="address-form"
+                              className="space-y-3"
+                              onSubmit={addressForm.handleSubmit(
+                                 handleUpdateProfile
+                              )}
+                           >
+                              <FormField
+                                 control={addressForm.control}
+                                 name="address"
+                                 render={({ field, fieldState }) => {
+                                    return (
+                                       <FormItem>
+                                          <FormLabel required>
+                                             Address
+                                          </FormLabel>
+                                          <FormControl>
+                                             <Input
+                                                {...field}
+                                                error={
+                                                   fieldState.error?.message
+                                                }
+                                                placeholder="Address"
+                                                className="max-w-sm"
+                                             />
+                                          </FormControl>
+                                          <FormMessage />
+                                       </FormItem>
+                                    );
+                                 }}
+                              />
+                           </form>
+                        </Form>
                      </div>
-                     <Form {...addressForm}>
-                        <form
-                           id="address-form"
-                           className="space-y-3"
-                           onSubmit={addressForm.handleSubmit(
-                              handleUpdateProfile
-                           )}
-                        >
-                           <FormField
-                              control={addressForm.control}
-                              name="address"
-                              render={({ field, fieldState }) => {
-                                 return (
-                                    <FormItem>
-                                       <FormLabel required>Address</FormLabel>
-                                       <FormControl>
-                                          <Input
-                                             {...field}
-                                             error={fieldState.error?.message}
-                                             placeholder="Address"
-                                             className="max-w-sm"
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 );
-                              }}
-                           />
-                        </form>
-                     </Form>
-                  </div>
-               </SectionBody>
-               <SectionInfoFooter>
-                  <Button
-                     form="address-form"
-                     type="submit"
-                     className="ml-auto"
-                     loading={isUpdateProfileLoading}
-                  >
-                     Save
-                  </Button>
-               </SectionInfoFooter>
-            </SectionInfo>
-            <SectionInfo>
-               <SectionBody>
-                  <div className="space-y-4">
-                     <div>
-                        <SectionInfoTitle title="Change password" />
-                        <p>
-                           Please enter your old password and your new password
-                           to change your password.
-                        </p>
+                  </SectionBody>
+                  <SectionInfoFooter>
+                     <Button
+                        form="address-form"
+                        type="submit"
+                        className="ml-auto"
+                        loading={isUpdateProfileLoading}
+                     >
+                        Save
+                     </Button>
+                  </SectionInfoFooter>
+               </SectionInfo>
+               <SectionInfo>
+                  <SectionBody>
+                     <div className="space-y-4">
+                        <div>
+                           <SectionInfoTitle title="Change password" />
+                           <p>
+                              Please enter your old password and your new
+                              password to change your password.
+                           </p>
+                        </div>
+                        <Form {...passwordForm}>
+                           <form
+                              id="password-form"
+                              className="space-y-3"
+                              onSubmit={passwordForm.handleSubmit(
+                                 handleChangePassword
+                              )}
+                           >
+                              <FormField
+                                 control={passwordForm.control}
+                                 name="oldPassword"
+                                 render={({ field, fieldState }) => {
+                                    return (
+                                       <FormItem>
+                                          <FormLabel required>
+                                             Old password
+                                          </FormLabel>
+                                          <FormControl>
+                                             <Input
+                                                {...field}
+                                                error={
+                                                   fieldState.error?.message
+                                                }
+                                                placeholder="Old password"
+                                                className="max-w-sm"
+                                                type="password"
+                                             />
+                                          </FormControl>
+                                          <FormMessage />
+                                       </FormItem>
+                                    );
+                                 }}
+                              />
+                              <FormField
+                                 control={passwordForm.control}
+                                 name="newPassword"
+                                 render={({ field, fieldState }) => {
+                                    return (
+                                       <FormItem>
+                                          <FormLabel required>
+                                             New password
+                                          </FormLabel>
+                                          <FormControl>
+                                             <Input
+                                                {...field}
+                                                error={
+                                                   fieldState.error?.message
+                                                }
+                                                placeholder="New password"
+                                                className="max-w-sm"
+                                                type="password"
+                                             />
+                                          </FormControl>
+                                          <FormMessage />
+                                       </FormItem>
+                                    );
+                                 }}
+                              />
+                              <FormField
+                                 control={passwordForm.control}
+                                 name="confirmPassword"
+                                 render={({ field, fieldState }) => {
+                                    return (
+                                       <FormItem>
+                                          <FormLabel required>
+                                             Confirm password
+                                          </FormLabel>
+                                          <FormControl>
+                                             <Input
+                                                {...field}
+                                                error={
+                                                   fieldState.error?.message
+                                                }
+                                                placeholder="Confirm password"
+                                                className="max-w-sm"
+                                                type="password"
+                                             />
+                                          </FormControl>
+                                          <FormMessage />
+                                       </FormItem>
+                                    );
+                                 }}
+                              />
+                           </form>
+                        </Form>
                      </div>
-                     <Form {...passwordForm}>
-                        <form
-                           id="password-form"
-                           className="space-y-3"
-                           onSubmit={passwordForm.handleSubmit(
-                              handleChangePassword
-                           )}
-                        >
-                           <FormField
-                              control={passwordForm.control}
-                              name="oldPassword"
-                              render={({ field, fieldState }) => {
-                                 return (
-                                    <FormItem>
-                                       <FormLabel required>
-                                          Old password
-                                       </FormLabel>
-                                       <FormControl>
-                                          <Input
-                                             {...field}
-                                             error={fieldState.error?.message}
-                                             placeholder="Old password"
-                                             className="max-w-sm"
-                                             type="password"
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 );
-                              }}
-                           />
-                           <FormField
-                              control={passwordForm.control}
-                              name="newPassword"
-                              render={({ field, fieldState }) => {
-                                 return (
-                                    <FormItem>
-                                       <FormLabel required>
-                                          New password
-                                       </FormLabel>
-                                       <FormControl>
-                                          <Input
-                                             {...field}
-                                             error={fieldState.error?.message}
-                                             placeholder="New password"
-                                             className="max-w-sm"
-                                             type="password"
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 );
-                              }}
-                           />
-                           <FormField
-                              control={passwordForm.control}
-                              name="confirmPassword"
-                              render={({ field, fieldState }) => {
-                                 return (
-                                    <FormItem>
-                                       <FormLabel required>
-                                          Confirm password
-                                       </FormLabel>
-                                       <FormControl>
-                                          <Input
-                                             {...field}
-                                             error={fieldState.error?.message}
-                                             placeholder="Confirm password"
-                                             className="max-w-sm"
-                                             type="password"
-                                          />
-                                       </FormControl>
-                                       <FormMessage />
-                                    </FormItem>
-                                 );
-                              }}
-                           />
-                        </form>
-                     </Form>
-                  </div>
-               </SectionBody>
-               <SectionInfoFooter>
-                  <Button
-                     form="password-form"
-                     type="submit"
-                     className="ml-auto"
-                     loading={isChangePasswordLoading}
-                  >
-                     Change
-                  </Button>
-               </SectionInfoFooter>
-            </SectionInfo>
+                  </SectionBody>
+                  <SectionInfoFooter>
+                     <Button
+                        form="password-form"
+                        type="submit"
+                        className="ml-auto"
+                        loading={isChangePasswordLoading}
+                     >
+                        Change
+                     </Button>
+                  </SectionInfoFooter>
+               </SectionInfo>
+            </div>
          </div>
-      </div>
+      </>
    );
 };
 

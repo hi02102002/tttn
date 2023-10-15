@@ -1,4 +1,3 @@
-import { RowActions, TableToolbar } from '@/components/pages/scores';
 import { DataTable, DataTableColumnHeader } from '@/components/ui';
 import { useUser } from '@/contexts/user.ctx';
 import { useScores } from '@/hooks/api';
@@ -6,12 +5,12 @@ import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/student';
 import { RoleName } from '@/types/role';
 import { TQueryScore, TScore } from '@/types/score';
-import { NextPageWithLayout, TBaseResponse } from '@/types/shared';
-import { TStudent } from '@/types/student';
+import { NextPageWithLayout } from '@/types/shared';
 import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useMemo, useState } from 'react';
 
 const Scores: NextPageWithLayout = () => {
@@ -85,29 +84,37 @@ const Scores: NextPageWithLayout = () => {
    );
 
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold">Your scores</h2>
-            <p className="text-muted-foreground">List of all your scores</p>
+      <>
+         <Head>
+            <title>Student - Scores</title>
+         </Head>
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Your scores</h2>
+               <p className="text-muted-foreground">List of all your scores</p>
+            </div>
+            <DataTable
+               columns={columns}
+               data={data?.scores || []}
+               options={{
+                  manualPagination: true,
+                  manualSorting: true,
+                  enableMultiSort: true,
+                  state: {
+                     pagination,
+                     sorting,
+                  },
+                  onPaginationChange: setPagination,
+                  onSortingChange: setSorting,
+                  pageCount: calcPageCount(
+                     data?.total || 0,
+                     pagination.pageSize
+                  ),
+                  isLoading,
+               }}
+            />
          </div>
-         <DataTable
-            columns={columns}
-            data={data?.scores || []}
-            options={{
-               manualPagination: true,
-               manualSorting: true,
-               enableMultiSort: true,
-               state: {
-                  pagination,
-                  sorting,
-               },
-               onPaginationChange: setPagination,
-               onSortingChange: setSorting,
-               pageCount: calcPageCount(data?.total || 0, pagination.pageSize),
-               isLoading,
-            }}
-         />
-      </div>
+      </>
    );
 };
 

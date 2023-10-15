@@ -34,6 +34,7 @@ import { withUser } from '@/utils/withUser';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { ColumnDef, PaginationState } from '@tanstack/react-table';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 
@@ -250,6 +251,9 @@ const Classrooms: NextPageWithLayout = () => {
 
    return (
       <>
+         <Head>
+            <title>Manage classrooms</title>
+         </Head>
          <div className="space-y-4">
             <div>
                <h2 className="text-2xl font-semibold">Manage classrooms</h2>

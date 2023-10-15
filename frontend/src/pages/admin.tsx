@@ -5,6 +5,7 @@ import { RoleName } from '@/types/role';
 import { NextPageWithLayout } from '@/types/shared';
 import { withUser } from '@/utils/withUser';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
 import { v4 as uuid } from 'uuid';
 
@@ -45,25 +46,30 @@ const items: TSectionCard[] = [
 
 const Admin: NextPageWithLayout = () => {
    return (
-      <div className="space-y-4">
-         <div>
-            <h2 className="text-2xl font-semibold">Admin</h2>
-            <p className="text-muted-foreground">
-               Here you can manage your classrooms, students, subjects and their
-               scores
-            </p>
-         </div>
+      <>
+         <Head>
+            <title>Admin - Dashboard</title>
+         </Head>
+         <div className="space-y-4">
+            <div>
+               <h2 className="text-2xl font-semibold">Admin</h2>
+               <p className="text-muted-foreground">
+                  Here you can manage your classrooms, students, subjects and
+                  their scores
+               </p>
+            </div>
 
-         <ul className="md:grid-cols-2 gap-4 grid">
-            {items.map((item) => (
-               <li key={item.id}>
-                  <Link href={item.path}>
-                     <SectionCard item={item} />
-                  </Link>
-               </li>
-            ))}
-         </ul>
-      </div>
+            <ul className="md:grid-cols-2 gap-4 grid">
+               {items.map((item) => (
+                  <li key={item.id}>
+                     <Link href={item.path}>
+                        <SectionCard item={item} />
+                     </Link>
+                  </li>
+               ))}
+            </ul>
+         </div>
+      </>
    );
 };
 
