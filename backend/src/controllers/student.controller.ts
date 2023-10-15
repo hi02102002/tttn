@@ -1,5 +1,6 @@
 import { StudentService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
+import { convertExcelToPdf } from '@/utils/convert-excel-pdf';
 import { StatusCodes } from 'http-status-codes';
 import Container from 'typedi';
 
@@ -59,8 +60,19 @@ export class StudentController {
     });
   });
 
-  public exportSubjectStudent = catchAsync(async (req, res) => {
-    const workbook = await this.studentService.exportSubjectStudent(req.params.mssv);
+  public exportSubjectStudent = catchAsync(async (req, res): Promise<any> => {
+    const workbook = await this.studentService.exportSubjectStudent(req.body);
+
+    if (req.body.type === 'pdf') {
+      const buffer = await workbook.xlsx.writeBuffer();
+
+      const _res = await convertExcelToPdf(buffer);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=${req.body.mssv}.pdf`);
+
+      return res.send(_res);
+    }
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=dsd.xlsx');

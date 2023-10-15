@@ -1,6 +1,7 @@
-import { CreateDto } from '@/dtos/classes';
+import { CreateDto, ExportDto } from '@/dtos/classes';
 import { ClassService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
+import { convertExcelToPdf } from '@/utils/convert-excel-pdf';
 import { StatusCodes } from 'http-status-codes';
 import Container from 'typedi';
 
@@ -59,12 +60,23 @@ export class ClassController {
     });
   });
 
-  public exportClasses = catchAsync(async (req, res) => {
-    const workbook = await this.classService.exportAllClassesWithStudent(req.body as any);
+  public exportClasses = catchAsync(async (req, res): Promise<any> => {
+    const dto: ExportDto = req.body;
+    const workbook = await this.classService.exportAllClassesWithStudent(dto);
+
+    if (dto.classId && dto.type === 'pdf') {
+      const buffer = await workbook.xlsx.writeBuffer();
+
+      const _res = await convertExcelToPdf(buffer);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=${dto.classId}.pdf`);
+
+      return res.send(_res);
+    }
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=classes.xlsx');
-
-    await workbook.xlsx.write(res);
+    res.setHeader('Content-Disposition', `attachment; filename=${dto.classId}.xlsx`);
+    return await workbook.xlsx.write(res);
   });
 }

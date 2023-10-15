@@ -1,4 +1,4 @@
-import { TOderBy, TQueryPagination } from './shared';
+import { EExportType, TOderBy, TQueryPagination } from './shared';
 
 export type TClassroom = {
    name: string;
@@ -19,3 +19,8 @@ export type TClassroomQuery = TQueryPagination & {
    name?: TClassroom['name'];
    academicYear?: TClassroom['academicYear'];
 } & TOderBy;
+
+export type TExportDto = {
+   classId?: string;
+   type?: EExportType;
+};

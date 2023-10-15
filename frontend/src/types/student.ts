@@ -1,5 +1,5 @@
 import { TClassroom } from './class';
-import { TOderBy, TQueryPagination } from './shared';
+import { EExportType, TOderBy, TQueryPagination } from './shared';
 
 export type TStudent = {
    mssv: string;
@@ -22,4 +22,10 @@ export type TStudentDto = Omit<TStudent, 'mssv' | 'class'>;
 export type TAddSubjectsToStudentDto = {
    mssv: string;
    subjectIds: string[];
+};
+
+export type TExportDto = {
+   mssv: string;
+   type: EExportType;
+   filename: string;
 };

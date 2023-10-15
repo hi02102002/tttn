@@ -37,3 +37,8 @@ export type TOderBy = {
 export interface TBaseService {
    endpoint: string;
 }
+
+export enum EExportType {
+   XLSX = 'xlsx',
+   PDF = 'pdf',
+}

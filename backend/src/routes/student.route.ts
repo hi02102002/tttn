@@ -1,5 +1,5 @@
 import { StudentController } from '@/controllers';
-import { CreateDto, DeleteStudentsDto, QueryDto, UpdateDto } from '@/dtos/students';
+import { CreateDto, DeleteStudentsDto, ExportDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { Routes } from '@/interfaces/routes.interface';
 import { AuthMiddleware, validate } from '@/middlewares';
 import { roles } from '@/middlewares/roles.middleware';
@@ -56,6 +56,15 @@ export class StudentRoute implements Routes {
       this.controller.deleteManyStudents,
     );
     this.router.post(`${this.path}/add-subjects`, AuthMiddleware, roles([RoleName.ADMIN]), this.controller.addSubjects);
-    this.router.get(`${this.path}/export/:mssv`, AuthMiddleware, this.controller.exportSubjectStudent);
+
+    this.router.post(
+      `${this.path}/export`,
+      AuthMiddleware,
+      validate({
+        type: ExportDto,
+      }),
+      roles([RoleName.ADMIN]),
+      this.controller.exportSubjectStudent,
+    );
   }
 }

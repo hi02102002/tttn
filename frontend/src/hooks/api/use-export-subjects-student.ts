@@ -1,4 +1,5 @@
 import { studentsService } from '@/services/students.service';
+import { TExportDto } from '@/types/student';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useDownload } from '../shared';
@@ -6,10 +7,11 @@ import { useDownload } from '../shared';
 export const useExportSubjectsStudent = () => {
    const download = useDownload();
    return useMutation({
-      mutationFn: async (mssv: string) => {
-         const res = await studentsService.exportSubjectStudent(mssv);
+      mutationFn: async (data: TExportDto) => {
+         const { filename } = data;
+         const res = await studentsService.exportSubjectStudent(data);
 
-         await download(res, `${mssv}.xlsx`);
+         await download(res, filename);
 
          return res;
       },

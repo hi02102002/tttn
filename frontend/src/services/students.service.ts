@@ -3,6 +3,7 @@ import { httpClient } from '@/lib/axios';
 import { TBaseResponse, TBaseService } from '@/types/shared';
 import {
    TAddSubjectsToStudentDto,
+   TExportDto,
    TQueryStudent,
    TStudent,
    TStudentDto,
@@ -52,10 +53,17 @@ class StudentsService implements TBaseService {
       return httpClient.post(`${this.endpoint}/add-subjects`, data);
    }
 
-   exportSubjectStudent(mssv: string): Promise<Blob> {
-      return httpClient.get(`${this.endpoint}/export/${mssv}`, {
-         responseType: 'blob',
-      });
+   exportSubjectStudent({ mssv, type }: TExportDto): Promise<Blob> {
+      return httpClient.post(
+         `${this.endpoint}/export`,
+         {
+            type,
+            mssv,
+         },
+         {
+            responseType: 'blob',
+         }
+      );
    }
 }
 

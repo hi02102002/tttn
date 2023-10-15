@@ -1,3 +1,4 @@
+import { Export } from '@/components/shared';
 import {
    Button,
    ConfirmDialog,
@@ -14,6 +15,7 @@ import {
    useExportSubjectsStudent,
    useUpdateStudent,
 } from '@/hooks/api';
+import { EExportType } from '@/types/shared';
 import { TQueryStudent, TStudent } from '@/types/student';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Row } from '@tanstack/react-table';
@@ -60,13 +62,30 @@ export const RowActions = ({ row, q }: Props) => {
                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-[160px]">
-               <DropdownMenuItem
-                  onClick={() => {
-                     exportSubjectsStudent(row.original.mssv);
+               <Export
+                  defaultValues={{
+                     name: row.original.name,
+                     type: EExportType.XLSX,
+                  }}
+                  description='Export list scores of student "MSSV" to file excel'
+                  title="Export list scores"
+                  onSubmit={async ({ values, onClose }) => {
+                     await exportSubjectsStudent({
+                        filename: values.name,
+                        type: values.type,
+                        mssv: row.original.mssv,
+                     });
+                     onClose?.();
                   }}
                >
-                  Export list scores
-               </DropdownMenuItem>
+                  <DropdownMenuItem
+                     onSelect={(e) => {
+                        e.preventDefault();
+                     }}
+                  >
+                     Export list scores
+                  </DropdownMenuItem>
+               </Export>
                <DropdownMenuItem
                   onClick={() => {
                      router.push(`${ROUTES.SCORES}?mssv=${row.original.mssv}`);

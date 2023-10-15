@@ -1,8 +1,6 @@
-import {
-   AddUpdateClassroomDialog,
-   ExportClassrooms,
-} from '@/components/pages/classrooms';
+import { AddUpdateClassroomDialog } from '@/components/pages/classrooms';
 import { AddUpdateStudent } from '@/components/pages/students';
+import { Export } from '@/components/shared';
 import {
    Button,
    Checkbox,
@@ -30,7 +28,7 @@ import { useFilterName, useSorting } from '@/hooks/shared';
 import Layout from '@/layouts/app';
 import { TClassroom, TClassroomQuery } from '@/types/class';
 import { RoleName } from '@/types/role';
-import { NextPageWithLayout } from '@/types/shared';
+import { EExportType, NextPageWithLayout } from '@/types/shared';
 import { calcPageCount } from '@/utils';
 import { withUser } from '@/utils/withUser';
 import { DotsHorizontalIcon } from '@radix-ui/react-icons';
@@ -186,12 +184,17 @@ const Classrooms: NextPageWithLayout = () => {
                         >
                            View students
                         </DropdownMenuItem>
-                        <ExportClassrooms
-                           classroom={row.original}
-                           onSubmit={async ({ name, onClose }) => {
+                        <Export
+                           title={`Export students in ${row.original.name}`}
+                           defaultValues={{
+                              name: row.original.name.replace(' ', '_'),
+                              type: EExportType.XLSX,
+                           }}
+                           description="Export all students in this classroom"
+                           onSubmit={async ({ values, onClose }) => {
                               await handleExportAllClassrooms({
                                  classId: row.original.id,
-                                 filename: name,
+                                 ...values,
                               });
                               onClose?.();
                            }}
@@ -201,7 +204,7 @@ const Classrooms: NextPageWithLayout = () => {
                            >
                               Export list of students
                            </DropdownMenuItem>
-                        </ExportClassrooms>
+                        </Export>
                         <AddUpdateClassroomDialog
                            title="Update classroom"
                            description="Update classroom details"

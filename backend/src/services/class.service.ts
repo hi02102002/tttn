@@ -187,7 +187,8 @@ export class ClassService {
       const B8 = sheet.getCell('B8');
       const E8 = sheet.getCell('E8');
       const H8 = sheet.getCell('H8');
-
+      const H = sheet.getColumn('H');
+      H.width = 30;
       A2.value = 'BỘ GIÁO DỤC VÀ ĐÀO TẠO';
       A3.value = 'Đại học Giao Thông Vận Tải TP.HCM';
       A2.alignment = { horizontal: 'center' };
@@ -263,6 +264,8 @@ export class ClassService {
           };
         });
       }
+
+      const maxWidthLimit = 30; // Adjust this value to your desired maximum width
     }
 
     return workbook;

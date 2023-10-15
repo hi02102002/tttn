@@ -1,6 +1,6 @@
 import { scoreTenToAcademicRank, scoreTenToFour, scoreTenToLetter } from '@/constants';
 import { db } from '@/db/prisma';
-import { AddSubjectsDto, CreateDto, QueryDto, UpdateDto } from '@/dtos/students';
+import { AddSubjectsDto, CreateDto, ExportDto, QueryDto, UpdateDto } from '@/dtos/students';
 import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Class, Prisma, Subject } from '@prisma/client';
@@ -252,10 +252,10 @@ export class StudentService {
     });
   }
 
-  async exportSubjectStudent(mssv: string) {
-    const student = await this.getStudentByMssv(mssv);
+  async exportSubjectStudent(data: ExportDto) {
+    const student = await this.getStudentByMssv(data.mssv);
 
-    const subjects = await this.subjectService.getSubjectsByMssv(mssv);
+    const subjects = await this.subjectService.getSubjectsByMssv(data.mssv);
 
     const workbook = new ExcelJS.Workbook();
 

@@ -1,4 +1,5 @@
 import { classroomsService } from '@/services';
+import { TExportDto } from '@/types/class';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useDownload } from '../shared';
@@ -6,11 +7,23 @@ import { useDownload } from '../shared';
 export const useExportClassrooms = () => {
    const download = useDownload();
    return useMutation({
-      mutationFn: async (options?: { classId?: string; filename?: string }) => {
-         const { filename = 'classrooms.xlsx', classId } = options || {};
-         const res = await classroomsService.exportAllClassrooms({ classId });
+      mutationFn: async (
+         options?: TExportDto & {
+            filename?: string;
+         }
+      ) => {
+         const { filename, classId, type } = options || {};
 
-         await download(res, filename);
+         console.log({
+            classId,
+            type,
+         });
+         const res = await classroomsService.exportAllClassrooms({
+            classId,
+            type,
+         });
+
+         await download(res, filename || `classrooms.${type}`);
 
          return res;
       },

@@ -1,6 +1,11 @@
 import { ENDPOINTS } from '@/constants';
 import { httpClient } from '@/lib/axios';
-import { TClassroom, TClassroomDto, TClassroomQuery } from '@/types/class';
+import {
+   TClassroom,
+   TClassroomDto,
+   TClassroomQuery,
+   TExportDto,
+} from '@/types/class';
 import { TBaseResponse, TBaseService } from '@/types/shared';
 
 class ClassroomsService implements TBaseService {
@@ -42,7 +47,7 @@ class ClassroomsService implements TBaseService {
       return httpClient.delete(this.endpoint, { data: { ids } });
    }
 
-   exportAllClassrooms(data?: { classId?: string }): Promise<Blob> {
+   exportAllClassrooms(data?: TExportDto): Promise<Blob> {
       return httpClient.post(`${this.endpoint}/export`, data, {
          responseType: 'blob',
       });
