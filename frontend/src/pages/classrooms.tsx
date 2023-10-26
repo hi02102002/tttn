@@ -195,6 +195,7 @@ const Classrooms: NextPageWithLayout = () => {
                            onSubmit={async ({ values, onClose }) => {
                               await handleExportAllClassrooms({
                                  classId: row.original.id,
+                                 filename: values.name,
                                  ...values,
                               });
                               onClose?.();
@@ -295,7 +296,9 @@ const Classrooms: NextPageWithLayout = () => {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                  onClick={() => {
-                                    handleExportAllClassrooms(undefined);
+                                    handleExportAllClassrooms({
+                                       type: EExportType.XLSX,
+                                    });
                                  }}
                               >
                                  Export list of classes

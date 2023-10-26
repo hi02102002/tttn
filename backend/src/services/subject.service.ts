@@ -10,8 +10,7 @@ import { StudentService } from './student.service';
 
 @Service()
 export class SubjectService {
-  @Inject(type => StudentService)
-  private readonly studentService: StudentService;
+  constructor(@Inject(type => StudentService) private readonly studentService: StudentService) {}
 
   async getAllSubjects(q?: QueryDto) {
     const { page, limit, name, studentId } = q || {};

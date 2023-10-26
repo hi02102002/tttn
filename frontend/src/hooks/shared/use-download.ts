@@ -11,8 +11,6 @@ export const useDownload = () => {
    document.body.appendChild(a);
    a.setAttribute('style', 'display: none');
    return async function (data: Blob, fileName: string) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const url = window.URL.createObjectURL(data);
       a.href = url;
       a.download = fileName;

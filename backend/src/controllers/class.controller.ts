@@ -1,7 +1,6 @@
 import { CreateDto, ExportDto } from '@/dtos/classes';
 import { ClassService } from '@/services';
 import { catchAsync } from '@/utils/catch-async';
-import { convertExcelToPdf } from '@/utils/convert-excel-pdf';
 import { StatusCodes } from 'http-status-codes';
 import Container from 'typedi';
 
@@ -65,9 +64,11 @@ export class ClassController {
     const workbook = await this.classService.exportAllClassesWithStudent(dto);
 
     if (dto.classId && dto.type === 'pdf') {
-      const buffer = await workbook.xlsx.writeBuffer();
+      // const buffer = await workbook.xlsx.writeBuffer();
 
-      const _res = await convertExcelToPdf(buffer);
+      // const _res = await convertExcelToPdf(buffer);
+
+      const _res = await this.classService.exportAllStudentPdf(dto);
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=${dto.classId}.pdf`);

@@ -5,6 +5,9 @@ import { pagination } from '@/utils/pagination';
 import { Prisma } from '@prisma/client';
 import ExcelJS from 'exceljs';
 import { StatusCodes } from 'http-status-codes';
+import path from 'path';
+import PdfPrinter from 'pdfmake';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { Service } from 'typedi';
 
 @Service()
@@ -269,6 +272,150 @@ export class ClassService {
     }
 
     return workbook;
+  }
+
+  async exportAllStudentPdf({ classId }: ExportDto) {
+    const _class = await db.class.findUnique({
+      where: {
+        id: classId,
+      },
+    });
+
+    if (!_class) {
+      throw new HttpException(StatusCodes.NOT_FOUND, `Class with this id not found`);
+    }
+
+    const students = await db.student.findMany({
+      where: {
+        classId,
+      },
+      orderBy: {
+        mssv: 'asc',
+      },
+    });
+
+    const fonts = {
+      TimesNewRoman: {
+        normal: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman.ttf'),
+        bold: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Bold.ttf'),
+        italics: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Italic.ttf'),
+        bolditalics: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Bold-Italic.ttf'),
+      },
+    };
+
+    const printer = new PdfPrinter(fonts);
+
+    const docDefinition: TDocumentDefinitions = {
+      content: [
+        {
+          columns: [
+            {
+              stack: [
+                {
+                  text: 'BỘ GIÁO DỤC VÀ ĐÀO TẠO',
+                  style: 'header',
+                },
+                {
+                  text: 'Đại học Giao Thông Vận Tải TP.HCM',
+                  style: 'header',
+                },
+              ],
+            },
+            {
+              stack: [
+                {
+                  text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',
+                  style: 'header',
+                },
+                {
+                  text: 'Độc lập - Tự do - Hạnh phúc',
+                  style: 'header',
+                  italics: true,
+                },
+                {
+                  text: `Hồ Chí Minh, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`,
+                  italics: true,
+                  alignment: 'center',
+                },
+              ],
+            },
+          ],
+          marginBottom: 20,
+        },
+        {
+          text: `Danh sách sinh viên lớp ${_class.name}`.toUpperCase(),
+          alignment: 'center',
+          bold: true,
+          marginBottom: 20,
+        },
+        {
+          table: {
+            widths: ['auto', 80, 100, '*'],
+            body: [
+              [
+                {
+                  text: 'STT',
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'MSSV',
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Họ và tên',
+                  bold: true,
+                  alignment: 'center',
+                },
+                {
+                  text: 'Địa chỉ',
+                  bold: true,
+                  alignment: 'center',
+                },
+              ],
+              ...(students.length === 0
+                ? [
+                    [
+                      {
+                        text: 'Không có dữ liệu',
+                        colSpan: 4,
+                        alignment: 'center',
+                      },
+                    ],
+                  ]
+                : students.map((student, index) => [index + 1, student.mssv, student.name, student.address])),
+            ],
+          },
+          marginBottom: 20,
+        },
+      ],
+      styles: {
+        header: {
+          bold: true,
+          alignment: 'center',
+        },
+      },
+      defaultStyle: {
+        font: 'TimesNewRoman',
+        fontSize: 10,
+      },
+    };
+
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+    const buffers: Uint8Array[] = [];
+
+    pdfDoc.on('data', function (buffer) {
+      buffers.push(buffer);
+    });
+
+    return new Promise((resolve, reject) => {
+      pdfDoc.on('end', () => {
+        resolve(Buffer.concat(buffers));
+      });
+      pdfDoc.end();
+    });
   }
 
   getColumns(): Partial<ExcelJS.Column>[] {

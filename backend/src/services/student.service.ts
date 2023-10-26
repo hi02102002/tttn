@@ -7,16 +7,19 @@ import { Class, Prisma, Subject } from '@prisma/client';
 import ExcelJS from 'exceljs';
 import { StatusCodes } from 'http-status-codes';
 import { omit } from 'lodash';
+import path from 'path';
+import PdfPrinter from 'pdfmake';
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import 'reflect-metadata';
 import { Inject, Service } from 'typedi';
 import { AuthService } from './auth.service';
 import { ClassService } from './class.service';
 import { SubjectService } from './subject.service';
+
 @Service()
 export class StudentService {
   @Inject(type => SubjectService)
   private readonly subjectService: SubjectService;
-
   constructor(private readonly classService: ClassService, private readonly authService: AuthService) {}
 
   async getAllStudents(q?: QueryDto) {
@@ -516,5 +519,155 @@ export class StudentService {
     }, 0);
 
     return gpa10 / totalCredits;
+  }
+
+  async exportPdfSubjectStudent(data: ExportDto) {
+    const student = await this.getStudentByMssv(data.mssv);
+
+    const subjects = await this.subjectService.getSubjectsByMssv(data.mssv);
+
+    const fonts = {
+      TimesNewRoman: {
+        normal: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman.ttf'),
+        bold: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Bold.ttf'),
+        italics: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Italic.ttf'),
+        bolditalics: path.join(process.cwd(), 'fonts', 'SVN-Times-New-Roman-Bold-Italic.ttf'),
+      },
+    };
+
+    const printer = new PdfPrinter(fonts);
+
+    const docDefinition: TDocumentDefinitions = {
+      content: [
+        {
+          columns: [
+            {
+              stack: [
+                {
+                  text: 'BỘ GIÁO DỤC VÀ ĐÀO TẠO',
+                  style: 'header',
+                },
+                {
+                  text: 'Đại học Giao Thông Vận Tải TP.HCM',
+                  style: 'header',
+                },
+              ],
+            },
+            {
+              stack: [
+                {
+                  text: 'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',
+                  style: 'header',
+                },
+                {
+                  text: 'Độc lập - Tự do - Hạnh phúc',
+                  style: 'header',
+                  italics: true,
+                },
+                {
+                  text: `Hồ Chí Minh, ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`,
+                  italics: true,
+                  alignment: 'center',
+                },
+              ],
+            },
+          ],
+          marginBottom: 20,
+        },
+        {
+          text: `BẢNG ĐIỂM ${student.name}`.toUpperCase(),
+          alignment: 'center',
+          bold: true,
+          marginBottom: 20,
+        },
+        {
+          table: {
+            widths: ['auto', '*', '*', '*', '*', '*'],
+            body: [
+              ['STT', 'Tên môn học', 'Tính chỉ', 'Điểm (điểm 10)', 'Điểm (điểm 4)', 'Điểm chữ'],
+              ...(subjects.length === 0
+                ? [
+                    [
+                      {
+                        text: 'Không có dữ liệu',
+                        colSpan: 6,
+                        alignment: 'center',
+                      },
+                    ],
+                  ]
+                : subjects.map((subject, index) => [
+                    index + 1,
+                    subject.name,
+                    subject.numCredits,
+                    subject.scores.length > 0 ? subject.scores[0].score.toNumber() : 'N/A',
+                    subject.scores.length > 0 ? scoreTenToFour(subject.scores[0].score.toNumber()) : 'N/A',
+                    subject.scores.length > 0 ? scoreTenToLetter(subject.scores[0].score.toNumber()) : 'N/A',
+                  ])),
+            ],
+          },
+          marginBottom: 20,
+        },
+        {
+          table: {
+            widths: ['auto', 'auto'],
+            body: [
+              [
+                {
+                  text: `Tổng số tín chỉ tích lũy: ${this.calcTotalCredits(subjects)}`,
+                  bold: true,
+                },
+                {
+                  text: `Điểm trung bình tích lũy (thang 4): ${scoreTenToFour(this.calcGpa10(subjects))}`,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text: `Tổng số tín chỉ đã đạt: ${this.calcCreditsPassed(subjects)}`,
+                  bold: true,
+                },
+
+                {
+                  text: `Điểm trung bình tích lũy (thang 10): ${this.calcGpa10(subjects).toFixed(2)}`,
+                  bold: true,
+                },
+              ],
+              [
+                {
+                  text: `Học lực: ${scoreTenToAcademicRank(this.calcGpa10(subjects))}`,
+                  bold: true,
+                },
+                '',
+              ],
+            ],
+          },
+        },
+      ],
+      styles: {
+        header: {
+          bold: true,
+          alignment: 'center',
+        },
+      },
+      defaultStyle: {
+        font: 'TimesNewRoman',
+        fontSize: 10,
+      },
+    };
+
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+    const buffers: Uint8Array[] = [];
+
+    pdfDoc.on('data', function (buffer) {
+      buffers.push(buffer);
+    });
+
+    return new Promise((resolve, reject) => {
+      pdfDoc.on('end', () => {
+        resolve(Buffer.concat(buffers));
+      });
+      pdfDoc.end();
+    });
   }
 }
