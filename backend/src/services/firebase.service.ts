@@ -1,9 +1,9 @@
-import { Service } from 'typedi';
-import * as firebase from 'firebase-admin';
-import { v4 as uuid } from 'uuid';
-import cert from '@cert.json';
-import * as mime from 'mime-types';
 import { Bucket } from '@google-cloud/storage';
+import * as firebase from 'firebase-admin';
+import * as mime from 'mime-types';
+import { Service } from 'typedi';
+import { v4 as uuid } from 'uuid';
+import cert from '../../cert.json';
 
 const STORAGE_URL = 'https://firebasestorage.googleapis.com/v0/b/tttn-1614e.appspot.com/o/';
 

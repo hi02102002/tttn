@@ -14,7 +14,7 @@ import { Service } from 'typedi';
 export class AuthService {
   public register = async (data: RegisterDto) => {
     try {
-      const { username, password, studentId, fullName } = data;
+      const { username, password, fullName } = data;
 
       const role = await db.role.findUnique({
         where: {
@@ -44,7 +44,6 @@ export class AuthService {
             },
           },
           fullName,
-          studentId,
         },
         select: {
           username: true,
@@ -87,7 +86,6 @@ export class AuthService {
         },
         avatar: true,
         status: true,
-        studentId: true,
       },
     });
 
@@ -164,7 +162,7 @@ export class AuthService {
   }
 
   async registerForAdmin(data: RegisterDto) {
-    const { username, password, fullName, studentId } = data;
+    const { username, password, fullName } = data;
 
     const role = await db.role.findUnique({
       where: {
@@ -179,7 +177,6 @@ export class AuthService {
         username,
         password: hashedPassword,
         fullName,
-        studentId,
         usersRoles: {
           createMany: {
             data: [

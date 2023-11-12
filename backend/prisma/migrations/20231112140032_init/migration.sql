@@ -5,10 +5,8 @@ CREATE TABLE `User` (
     `password` VARCHAR(191) NOT NULL,
     `full_name` VARCHAR(191) NULL,
     `status` ENUM('ACTIVE', 'BLOCKED') NOT NULL DEFAULT 'ACTIVE',
-    `studentId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `User_username_key`(`username`),
-    UNIQUE INDEX `User_studentId_key`(`studentId`),
     PRIMARY KEY (`user_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -73,6 +71,7 @@ CREATE TABLE `students` (
     `name` VARCHAR(191) NOT NULL,
     `address` VARCHAR(191) NOT NULL,
     `class_id` VARCHAR(191) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`mssv`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -80,16 +79,13 @@ CREATE TABLE `students` (
 -- CreateTable
 CREATE TABLE `scores` (
     `score_id` VARCHAR(191) NOT NULL,
-    `score` DECIMAL(65, 30) NULL,
+    `score` DOUBLE NULL,
     `mssv` VARCHAR(191) NOT NULL,
     `subject_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `scores_mssv_subject_id_key`(`mssv`, `subject_id`),
     PRIMARY KEY (`score_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `User_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `students`(`mssv`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `user_roles` ADD CONSTRAINT `user_roles_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -102,6 +98,9 @@ ALTER TABLE `files` ADD CONSTRAINT `files_userId_fkey` FOREIGN KEY (`userId`) RE
 
 -- AddForeignKey
 ALTER TABLE `students` ADD CONSTRAINT `students_class_id_fkey` FOREIGN KEY (`class_id`) REFERENCES `classes`(`class_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `students` ADD CONSTRAINT `students_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `scores` ADD CONSTRAINT `scores_mssv_fkey` FOREIGN KEY (`mssv`) REFERENCES `students`(`mssv`) ON DELETE CASCADE ON UPDATE CASCADE;

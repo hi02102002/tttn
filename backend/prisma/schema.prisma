@@ -23,8 +23,8 @@ model User {
   avatar     File?
   fullName   String?    @map("full_name")
   status     UserStatus @default(ACTIVE)
-  student    Student?   @relation(fields: [studentId], references: [mssv], onDelete: Cascade)
-  studentId  String?    @unique
+
+  Student Student[]
 }
 
 enum UserStatus {
@@ -96,14 +96,15 @@ model Student {
   classId String  @map("class_id")
   class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade) // 1 sinh viên chỉ thuộc 1 lớp
   scores  Score[]
-  user    User?
+  userId  String  @map("user_id")
+  user    User    @relation(fields: [userId], references: [id])
 
   @@map("students")
 }
 
 model Score {
-  id    String   @id @default(uuid()) @map("score_id")
-  score Decimal?
+  id    String @id @default(uuid()) @map("score_id")
+  score Float?
 
   studentId String  @map("mssv")
   subjectId String  @map("subject_id")

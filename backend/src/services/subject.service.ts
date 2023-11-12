@@ -5,13 +5,10 @@ import { HttpException } from '@/exceptions';
 import { pagination } from '@/utils/pagination';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
-import { Inject, Service } from 'typedi';
-import { StudentService } from './student.service';
+import { Service } from 'typedi';
 
 @Service()
 export class SubjectService {
-  constructor(@Inject(type => StudentService) private readonly studentService: StudentService) {}
-
   async getAllSubjects(q?: QueryDto) {
     const { page, limit, name, studentId } = q || {};
 
@@ -190,27 +187,21 @@ export class SubjectService {
   }
 
   async getAverageScoreByMssv(mssv: string) {
-    const student = await this.studentService.getStudentByMssv(mssv);
-
-    if (!student) {
-      throw new HttpException(StatusCodes.NOT_FOUND, 'Student not found');
-    }
-
     const subjects = await db.$queryRaw`
     SELECT 
       subjects.subject_id as subjectId,
       subjects.name AS subjectName,
       ROUND(AVG(COALESCE(scores.score,0)),2) AS averageScore,
-      ROUND(COALESCE(student_score.score),2) AS studentScore
+      ROUND(COALESCE(student_score.score,0),2) AS studentScore
     FROM subjects
     LEFT JOIN scores ON subjects.subject_id = scores.subject_id
     AND subjects.subject_id IN (
         SELECT DISTINCT subject_id
         FROM scores
-        WHERE mssv = ${mssv} -- Replace with the specific student's mssv
+        WHERE mssv = ${mssv} 
     )
     INNER JOIN scores AS student_score ON subjects.subject_id = student_score.subject_id
-    AND student_score.mssv = ${mssv} -- Replace with the specific student's mssv
+    AND student_score.mssv = ${mssv} 
     GROUP BY subjects.subject_id, subjects.name, student_score.score
     `;
 
@@ -218,6 +209,7 @@ export class SubjectService {
       subjectId: string;
       subjectName: string;
       averageScore: number;
+      studentScore: number;
     }>;
   }
 
@@ -239,12 +231,6 @@ export class SubjectService {
   }
 
   async addSubjectToStudent(mssv: string, fields: AddSubjectsStudentDto) {
-    const student = await this.studentService.getStudentByMssv(mssv);
-
-    if (!student) {
-      throw new HttpException(StatusCodes.NOT_FOUND, 'Student not found');
-    }
-
     const subjects = await db.subject.findMany({
       where: {
         id: {

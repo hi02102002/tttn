@@ -14,6 +14,7 @@ import Container from 'typedi';
 import L from './i18n/i18n-node';
 import { TRequestWithLocale } from './interfaces/common.type';
 import { getPreferredLocale } from './utils/get-pref-locale';
+import { seedClasses, seedStudents, seedSubjects } from './utils/seed';
 
 export class App {
   public app: express.Application;
@@ -30,6 +31,10 @@ export class App {
     this.initializeRoutes(routes);
     this.initializeErrorHandling();
     this.roleService.seedRoles();
+    seedClasses().then(() => {
+      seedStudents();
+      seedSubjects();
+    });
   }
 
   public listen() {

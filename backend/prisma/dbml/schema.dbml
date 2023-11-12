@@ -10,8 +10,7 @@ Table User {
   avatar files
   fullName String
   status UserStatus [not null, default: 'ACTIVE']
-  student students
-  studentId String [unique]
+  Student students [not null]
 }
 
 Table roles {
@@ -71,12 +70,13 @@ Table students {
   classId String [not null]
   class classes [not null]
   scores scores [not null]
-  user User
+  userId String [not null]
+  user User [not null]
 }
 
 Table scores {
   id String [pk]
-  score Decimal
+  score Float
   studentId String [not null]
   subjectId String [not null]
   student students [not null]
@@ -97,8 +97,6 @@ Enum RoleName {
   STUDENT
 }
 
-Ref: User.studentId - students.mssv [delete: Cascade]
-
 Ref: user_roles.userId > User.id [delete: Cascade]
 
 Ref: user_roles.roleId > roles.id
@@ -106,6 +104,8 @@ Ref: user_roles.roleId > roles.id
 Ref: files.userId - User.id [delete: Cascade]
 
 Ref: students.classId > classes.id [delete: Cascade]
+
+Ref: students.userId > User.id
 
 Ref: scores.studentId > students.mssv [delete: Cascade]
 

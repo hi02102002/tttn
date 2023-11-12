@@ -18,9 +18,11 @@ import { SubjectService } from './subject.service';
 
 @Service()
 export class StudentService {
-  @Inject(type => SubjectService)
-  private readonly subjectService: SubjectService;
-  constructor(private readonly classService: ClassService, private readonly authService: AuthService) {}
+  constructor(
+    private readonly classService: ClassService,
+    private readonly authService: AuthService,
+    @Inject(type => SubjectService) private readonly subjectService: SubjectService,
+  ) {}
 
   async getAllStudents(q?: QueryDto) {
     const { page, limit, name, address, classId, orderBy } = q || {};
@@ -118,33 +120,24 @@ export class StudentService {
       });
     }
 
+    const user = await this.authService.register({
+      username: mssv,
+      password: mssv,
+      confirmPassword: mssv,
+      fullName: data.name,
+    });
+
     const student = await db.student.create({
       data: {
         ...data,
         mssv,
+        userId: user.id,
       },
       include: {
         class: true,
       },
     });
 
-    try {
-      await this.authService.register({
-        username: mssv,
-        password: mssv,
-        confirmPassword: mssv,
-        fullName: data.name,
-        studentId: student.mssv,
-      });
-    } catch (error) {
-      await db.student.delete({
-        where: {
-          mssv,
-        },
-      });
-
-      throw error;
-    }
     return student;
   }
 
@@ -399,11 +392,11 @@ export class StudentService {
 
       const score = subject.scores[0]?.score;
 
-      J.value = score?.toNumber() || 'N/A';
+      J.value = score || 'N/A';
       J.alignment = { horizontal: 'center' };
-      L.value = score ? scoreTenToFour(score.toNumber()) : 'N/A';
+      L.value = score ? scoreTenToFour(score) : 'N/A';
       L.alignment = { horizontal: 'center' };
-      N.value = score ? scoreTenToLetter(score.toNumber()) : 'N/A';
+      N.value = score ? scoreTenToLetter(score) : 'N/A';
       N.alignment = { horizontal: 'center' };
 
       sheet.getRow(i + nextRow).eachCell(cell => {
@@ -483,13 +476,13 @@ export class StudentService {
     subjects: Array<
       Omit<Subject, 'deletedAt'> & {
         scores: {
-          score: Prisma.Decimal;
+          score: number;
         }[];
       }
     >,
   ) {
     const creditsPassed = subjects.reduce((acc, cur) => {
-      if (cur.scores[0]?.score?.toNumber() >= 4) {
+      if (cur.scores[0]?.score >= 4) {
         return acc + cur.numCredits;
       }
 
@@ -503,7 +496,7 @@ export class StudentService {
     subjects: Array<
       Omit<Subject, 'deletedAt'> & {
         scores: {
-          score: Prisma.Decimal;
+          score: number;
         }[];
       }
     >,
@@ -515,7 +508,7 @@ export class StudentService {
         return acc;
       }
 
-      return acc + cur.scores[0].score.toNumber() * cur.numCredits;
+      return acc + cur.scores[0].score * cur.numCredits;
     }, 0);
 
     return gpa10 / totalCredits;
@@ -599,9 +592,9 @@ export class StudentService {
                     index + 1,
                     subject.name,
                     subject.numCredits,
-                    subject.scores.length > 0 ? subject.scores[0].score.toNumber() : 'N/A',
-                    subject.scores.length > 0 ? scoreTenToFour(subject.scores[0].score.toNumber()) : 'N/A',
-                    subject.scores.length > 0 ? scoreTenToLetter(subject.scores[0].score.toNumber()) : 'N/A',
+                    subject.scores.length > 0 ? subject.scores[0].score : 'N/A',
+                    subject.scores.length > 0 ? scoreTenToFour(subject.scores[0].score) : 'N/A',
+                    subject.scores.length > 0 ? scoreTenToLetter(subject.scores[0].score) : 'N/A',
                   ])),
             ],
           },
